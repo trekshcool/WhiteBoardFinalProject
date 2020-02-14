@@ -37,9 +37,9 @@ public class Pixel {
     @Override @NonNull
     public String toString() {
         if (user == null) {
-            return "No user, " + Integer.toString(color, 16);
+            return String.format("No user, #%8x", color);
         } else {
-            return user + ", " + Integer.toString(color, 16);
+            return String.format("%s, #%8x", user, color);
         }
     }
 }
