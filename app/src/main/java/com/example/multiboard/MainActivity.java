@@ -11,6 +11,7 @@ import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
@@ -23,6 +24,8 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
 import java.io.FileDescriptor;
@@ -126,8 +129,44 @@ public class MainActivity extends AppCompatActivity {
         int response = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
         if (response != ConnectionResult.SUCCESS){
             Log.d(TAG, "Google play Services Not Available - Show Dialog to ask User to Download it");
+            GoogleApiAvailability.getInstance().getErrorDialog(this, response, 1).show();
+        }
+        else {
+            Log.d(TAG, "Google play Services is Available - no action is required");
         }
     }
+
+    @Override
+    protected void onStart(){
+        Log.d(TAG, "onStart called");
+        super.onStart();
+        googleApiClient.reconnect();
+    }
+
+    @Override
+    protected void onStop(){
+        Log.d(TAG, "onstop called");
+        super.onStop();
+        googleApiClient.disconnect();
+    }
+
+    private void startLocationMonitoring(){
+        Log.d(TAG, "startLocation called");
+        try{
+            LocationRequest locationRequest = LocationRequest.create()
+                    .setInterval(10000)
+                    .setFastestInterval(5000)
+                    //.set
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // eat more battory
+            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    Log.d(TAG, "Location update lat/long " + location.getLatitude() + " " + location.getLongitude());
+                }
+            });
+        }
+    }
+
 
     //demo Geofencie,  triggers
     private GeofencingRequest getGeofencingRequest() {
