@@ -1,24 +1,68 @@
 package com.example.multiboard;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.Api;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.LocationServices;
+
+import java.io.FileDescriptor;
+import java.io.PrintWriter;
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
     private GeofencingClient geofencingClient;
+    GoogleApiClient googleApiClient = null;
+    public static final String TAG = "MainActivity";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         geofencingClient = LocationServices.getGeofencingClient(this);
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+                    @Override
+                    public void onConnected(@Nullable Bundle bundle) {
+                       Log.d(TAG, "Connected to GoogleApiClient");
+                    }
+
+                    @Override
+                    public void onConnectionSuspended(int i) {
+                        Log.d(TAG, "Suspended connection to Google ApiClient");
+                    }
+
+
+                }).addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
+                    @Override
+                    public void onConnectionFailed(@NonNull ConnectionResult result) {
+                        Log.d(TAG, "Failed to connect ot googleapiClient- " + result.getErrorMessage());
+                    }
+                })
+                .build();
+        requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
 
 
 
@@ -71,6 +115,17 @@ public class MainActivity extends AppCompatActivity {
         } else {
             // Background location runtime permission already granted.
             // You can now call geofencingClient.addGeofences().
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        Log.d(TAG, "OnReume called");
+        super.onResume();
+
+        int response = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
+        if (response != ConnectionResult.SUCCESS){
+            Log.d(TAG, "Google play Services Not Available - Show Dialog to ask User to Download it");
         }
     }
 
