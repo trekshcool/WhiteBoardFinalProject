@@ -27,10 +27,10 @@ import android.widget.Toast;
 /**
  * This Activity is the default starting place for the app and allows the user to sign in.
  */
-public class MainActivity extends AppCompatActivity implements
+public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
-    private static final String TAG = "MainActivity";
+    private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9;
 
     private SignInButton mSignInButton;
@@ -43,7 +43,7 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_sign_in);
 
         // Assign fields
         mSignInButton = findViewById(R.id.button_sign_in);
@@ -126,11 +126,11 @@ public class MainActivity extends AppCompatActivity implements
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
                             Log.w(TAG, "signInWithCredential", task.getException());
-                            Toast.makeText(MainActivity.this, "Authentication failed.",
+                            Toast.makeText(SignInActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();
                         } else {
                             Log.d(TAG, "i am working");
-                            startActivity(new Intent(MainActivity.this, WhiteboardListActivity.class));
+                            startActivity(new Intent(SignInActivity.this, WhiteboardListActivity.class));
                             finish();
                         }
                     }
