@@ -7,14 +7,14 @@ import android.os.Bundle;
 import java.util.ArrayList;
 import java.util.List;
 
-public class WhiteboardListActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity {
 
     private List<Whiteboard> whiteboardList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_whiteboard_list);
+        setContentView(R.layout.activity_main);
 
         whiteboardList = new ArrayList<>();
     }
