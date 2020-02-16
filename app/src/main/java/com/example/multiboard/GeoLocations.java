@@ -7,4 +7,4 @@ public interface GeoLocations {
     // Fuller labs: 42.275040,-71.806377, 34.94
     // Atwater Kent: 42.275262,-71.807008 Radius: 37.83 Meters
     //Kaven Hall: Position: 42.274915,-71.805822 Radius: 29.00 Meters
-    //George C/ Cordon Libary:  Position: 42.274230,-71.806369 Radius: 32.53 Meters
+    //George C. Cordon Libary:  Position: 42.274230,-71.806369 Radius: 32.53 Meters
