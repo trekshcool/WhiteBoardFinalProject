@@ -28,7 +28,7 @@ import android.widget.Toast;
  * This Activity is the default starting place for the app and allows the user to sign in.
  */
 public class MainActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener {
+        GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
     private static final String TAG = "MainActivity";
     private static final int RC_SIGN_IN = 9;
@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements
 
         // Assign fields
         mSignInButton = findViewById(R.id.button_sign_in);
+        mSignInButton.setOnClickListener(this);
 
         // Configure Google Sign In
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -62,7 +63,15 @@ public class MainActivity extends AppCompatActivity implements
         mFirebaseAuth = FirebaseAuth.getInstance();
     }
 
-    public void signIn(View v) {
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.button_sign_in:
+                signIn();
+                break;
+        }
+    }
+
+    private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
