@@ -26,4 +26,19 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.0'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
+
+
+    // Google
+    implementation 'com.google.android.gms:play-services-auth:16.0.1'
+
+    // Firebase
+    implementation platform('com.google.firebase:firebase-bom:17.0.0')
+
+    // https://firebase.google.com/docs/android/setup#available-libraries
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.google.firebase:firebase-auth'
+
 }
+
+apply plugin: 'com.google.gms.google-services'

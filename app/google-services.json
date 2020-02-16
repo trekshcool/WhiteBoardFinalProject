@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "288348095306",
+    "firebase_url": "https://whiteboardfinalproject.firebaseio.com",
+    "project_id": "whiteboardfinalproject",
+    "storage_bucket": "whiteboardfinalproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:288348095306:android:37e5186cb896efad0b37b3",
+        "android_client_info": {
+          "package_name": "com.example.multiboard"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "288348095306-65qefc4alvh4cfqgiahqdc5dg2j879n6.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.multiboard",
+            "certificate_hash": "7ea3d230f3a83d3e04f69f5fd452e42a2f76b518"
+          }
+        },
+        {
+          "client_id": "288348095306-5thu2l4391h2q9pftdskrfjvkh4nggde.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDv3PGyg38HFCmNdttFe34nWijdV2MCJ7k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "288348095306-5thu2l4391h2q9pftdskrfjvkh4nggde.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

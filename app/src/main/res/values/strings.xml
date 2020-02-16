@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Multiboard</string>
+    <string name="text_sign_in">Sign in with Google to start using Multiboard!</string>
 </resources>
