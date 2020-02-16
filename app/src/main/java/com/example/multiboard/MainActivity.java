@@ -2,18 +2,22 @@ package com.example.multiboard;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.SyncStateContract;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -21,6 +25,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.PendingResult;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
@@ -28,9 +33,13 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.FileDescriptor;
 import java.io.PrintWriter;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity {
@@ -40,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
     public static final  String GEOFENCE_ID = "MyGeofenceId";
 
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,56 +81,56 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        //demo geofence, get user location
-        geofenceList.add(new Geofence.Builder()
-                // Set the request ID of the geofence. This is a string to identify this
-                // geofence.
-                .setRequestId(entry.getKey())
+//        //demo geofence, get user location
+//        geofenceList.add(new Geofence.Builder()
+//                // Set the request ID of the geofence. This is a string to identify this
+//                // geofence.
+//                .setRequestId(entry.getKey())
+//
+//                .setCircularRegion(
+//                        entry.getValue().latitude,
+//                        entry.getValue().longitude,
+//                        SyncStateContract.Constants.GEOFENCE_RADIUS_IN_METERS
+//                )
+//                .setExpirationDuration(SyncStateContract.Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
+//                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
+//                        Geofence.GEOFENCE_TRANSITION_EXIT)
+//                .build());
 
-                .setCircularRegion(
-                        entry.getValue().latitude,
-                        entry.getValue().longitude,
-                        Constants.GEOFENCE_RADIUS_IN_METERS
-                )
-                .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-                        Geofence.GEOFENCE_TRANSITION_EXIT)
-                .build());
+//        //create geofence
+//        geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
+//                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
+//                    @Override
+//                    public void onSuccess(Void aVoid) {
+//                        // Geofences added
+//                        // ...
+//                    }
+//                })
+//                .addOnFailureListener(this, new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        // Failed to add geofences
+//                        // ...
+//                    }
+//                });
 
-        //create geofence
-        geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        // Geofences added
-                        // ...
-                    }
-                })
-                .addOnFailureListener(this, new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        // Failed to add geofences
-                        // ...
-                    }
-                });
-
-        // Required if your app targets Android 10 or higher.
-        if (ContextCompat.checkSelfPermission(thisActivity,
-                Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-                != PackageManager.PERMISSION_GRANTED) {
-            if (permissionRationaleAlreadyShown) {
-                ActivityCompat.requestPermissions(thisActivity,
-                        new String[] { Manifest.permission.ACCESS_BACKGROUND_LOCATION },
-                        background-location-permission-request-code);
-            } else {
-                // Show an explanation to the user as to why your app needs the
-                // permission. Display the explanation *asynchronously* -- don't block
-                // this thread waiting for the user's response!
-            }
-        } else {
-            // Background location runtime permission already granted.
-            // You can now call geofencingClient.addGeofences().
-        }
+//        // Required if your app targets Android 10 or higher.
+//        if (ContextCompat.checkSelfPermission(thisActivity,
+//                Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+//                != PackageManager.PERMISSION_GRANTED) {
+//            if (permissionRationaleAlreadyShown) {
+//                ActivityCompat.requestPermissions(thisActivity,
+//                        new String[] { Manifest.permission.ACCESS_BACKGROUND_LOCATION },
+//                        background-location-permission-request-code);
+//            } else {
+//                // Show an explanation to the user as to why your app needs the
+//                // permission. Display the explanation *asynchronously* -- don't block
+//                // this thread waiting for the user's response!
+//            }
+//        } else {
+//            // Background location runtime permission already granted.
+//            // You can now call geofencingClient.addGeofences().
+//        }
     }
 
     @Override
@@ -184,10 +194,38 @@ public class MainActivity extends AppCompatActivity {
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                     .build();
 
-            GeofencingRequest geofencingRequest = new GeofencingRequest.Builder()
+            GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
                     .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
                     .addGeofence(geofence).build();
+
+            Intent intent = new Intent(this, GeofenceService.class);
+            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        if(!googleApiClient.isConnected()){
+            Log.d(TAG, "GoogleApiClient is not connected");
+        } else {
+            LocationServices.GeofencingApi.addGeofences(googleApiClient, geofenceRequest, pendingIntent)
+                    .setResultCallback(new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(@NonNull Status status) {
+                            if (status.isSuccess()){
+                                Log.d(TAG, "succefuly added geofence");
+                            } else {
+                                Log.d(TAG, "Failed to add Geofence" + status.getStatus());
+                            }
+                        }
+                    });
         }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private  void stopGeoFenceMonitoring(){
+        Log.d(TAG, "StopMoniotring Called");
+        ArrayList<String> geofenceIds = new ArrayList<String>();
+        geofenceIds.add(GEOFENCE_ID);
+        LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceIds);
     }
 
 
