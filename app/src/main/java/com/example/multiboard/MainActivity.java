@@ -24,6 +24,7 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -36,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private GeofencingClient geofencingClient;
     GoogleApiClient googleApiClient = null;
     public static final String TAG = "MainActivity";
+    public static final  String GEOFENCE_ID = "MyGeofenceId";
 
 
     @Override
@@ -164,36 +166,57 @@ public class MainActivity extends AppCompatActivity {
                     Log.d(TAG, "Location update lat/long " + location.getLatitude() + " " + location.getLongitude());
                 }
             });
+        } catch (SecurityException e){
+            Log.e(TAG, "SecurityExecption - " + e.getMessage());
+        }
+    }
+
+    private void startGeoFenceMonitoring(){
+        Log.e(TAG, "StartMonitoring Called");
+        try{
+            //googleApiClient.connect();
+
+            Geofence geofence = new Geofence.Builder()
+                    .setRequestId(GEOFENCE_ID)
+                    .setCircularRegion(33, -84, 100)
+                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setNotificationResponsiveness(1000)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .build();
+
+            GeofencingRequest geofencingRequest = new GeofencingRequest.Builder()
+                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                    .addGeofence(geofence).build();
         }
     }
 
 
-    //demo Geofencie,  triggers
-    private GeofencingRequest getGeofencingRequest() {
-        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);//trigger while divice is in the area
-        builder.addGeofences(geofenceList);
-        return builder.build();
-
-
-        // builder.setInitialTrigger(GeofencingRequest.GEOFENCE_TRANSITION_ENTER);//trigger when divice enter area
-        // builder.setInitialTrigger(GeofencingRequest.GEOFENCE_TRANSITION_EXIT); // trigger on exit
-        // builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL); // trigger while still in area
-
-    }
-
-    private PendingIntent getGeofencePendingIntent() {
-        // Reuse the PendingIntent if we already have it.
-        if (geofencePendingIntent != null) {
-            return geofencePendingIntent;
-        }
-        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
-        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
-        // calling addGeofences() and removeGeofences().
-        geofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.
-                FLAG_UPDATE_CURRENT);
-        return geofencePendingIntent;
-    }
+//    //demo Geofencie,  triggers
+//    private GeofencingRequest getGeofencingRequest() {
+//        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
+//        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);//trigger while divice is in the area
+//        builder.addGeofences(geofenceList);
+//        return builder.build();
+//
+//
+//        // builder.setInitialTrigger(GeofencingRequest.GEOFENCE_TRANSITION_ENTER);//trigger when divice enter area
+//        // builder.setInitialTrigger(GeofencingRequest.GEOFENCE_TRANSITION_EXIT); // trigger on exit
+//        // builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL); // trigger while still in area
+//
+//    }
+//
+//    private PendingIntent getGeofencePendingIntent() {
+//        // Reuse the PendingIntent if we already have it.
+//        if (geofencePendingIntent != null) {
+//            return geofencePendingIntent;
+//        }
+//        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+//        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
+//        // calling addGeofences() and removeGeofences().
+//        geofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.
+//                FLAG_UPDATE_CURRENT);
+//        return geofencePendingIntent;
+//    }
 }
 
 
