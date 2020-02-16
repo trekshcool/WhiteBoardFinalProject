@@ -10,6 +10,7 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,6 +72,9 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, Integer.toString(mUserId));
             }
         }
+
+        // Other Firebase
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
         // Whiteboards
         mWhiteboardList = new ArrayList<>();
