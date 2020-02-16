@@ -1,5 +1,7 @@
 package com.example.multiboard;
 
+import android.util.Log;
+
 /**
  * Represents an individual Whiteboard, storing pixels for painting and rendering and GPS
  * information for checking user coordinates.
@@ -16,6 +18,12 @@ public class Whiteboard {
 
     public Whiteboard(String name) {
         this.name = name;
+
+        for (int i = 0; i < width; i++) {
+            for (int j = 0; j < height; j++) {
+                board[j][i] = new Pixel();
+            }
+        }
     }
 
     @Override
