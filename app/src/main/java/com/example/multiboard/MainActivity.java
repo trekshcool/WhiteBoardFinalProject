@@ -42,6 +42,9 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * This Activity is the default starting place for the app and allows the user to sign in.
+ */
 public class MainActivity extends AppCompatActivity {
     private GeofencingClient geofencingClient;
     GoogleApiClient googleApiClient = null;
