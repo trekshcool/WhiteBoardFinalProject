@@ -33,6 +33,7 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.places.Place;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
@@ -40,7 +41,10 @@ import java.io.FileDescriptor;
 import java.io.PrintWriter;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 
 /**
  * This Activity is the default starting place for the app and allows the user to sign in.
@@ -192,7 +196,7 @@ public class MainActivity extends AppCompatActivity {
             Geofence geofence = new Geofence.Builder()
                     .setRequestId(GEOFENCE_ID)
                     .setCircularRegion(33, -84, 100)
-                    .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                    .setExpirationDuration(NEVER_EXPIRE)
                     .setNotificationResponsiveness(1000)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                     .build();
@@ -229,6 +233,31 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<String> geofenceIds = new ArrayList<String>();
         geofenceIds.add(GEOFENCE_ID);
         LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceIds);
+    }
+
+
+    //Create a list of
+    private static List<Geofence> getGeofenceList(List<Place> places) {
+        List<Geofence> geofenceList = new ArrayList<>();
+
+        for (Place place : places){
+            geofenceList.add(new Geofence.Builder()
+                    // Set the request ID of the geofence. This is a string to identify this
+                    // geofence.
+                    .setRequestId(String.valueOf(place.getId()))
+                    .setCircularRegion(
+                            place.getLatLng().latitude,
+                            place.getLatLng().longitude,
+                            place.getRating() // Radius??
+                    )
+                    .setExpirationDuration(NEVER_EXPIRE)
+                    //.setLoiteringDelay(LOITERING_DWELL_DELAY)
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)
+                    //.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)
+                    .build());
+        }
+
+        return geofenceList;
     }
 
 
