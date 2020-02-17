@@ -251,6 +251,8 @@ public class MainActivity extends AppCompatActivity {
                             place.getRating() // Radius??
                     )
                     .setExpirationDuration(NEVER_EXPIRE)
+                    .setNotificationResponsiveness(1000)
+                    //.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                     //.setLoiteringDelay(LOITERING_DWELL_DELAY)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)
                     //.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)

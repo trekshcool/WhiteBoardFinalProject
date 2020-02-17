@@ -1,6 +1,13 @@
 package com.example.multiboard;
 
-public interface GeoLocations {
+import java.util.ArrayList;
+import java.util.List;
+
+//create a class that returns a list of preset locations
+public class GeoLocations {
+
+    private List<GeoLocation> locat = new ArrayList<>();
+
 
 }
     // source: https://www.mapdevelopers.com/draw-circle-tool.php?circles=%5B%5B29.88%2C42.2750396%2C-71.8063774%2C%22%23AAAAAA%22%2C%22%23000000%22%2C0.4%5D%5D
