@@ -90,11 +90,14 @@ public class MainActivity extends AppCompatActivity {
      * Gets nearby Whiteboards and populates the layout and hashmap with their info.
      */
     private void populateWhiteboardCards() {
+        // Test code
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         for (int i = 0; i < 15; i++) {
             Whiteboard wb = new Whiteboard("test" + i);
             View cardView = inflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards);
             mWhiteboardMap.put(wb, cardView);
         }
+
+        // TODO: Retrieve Whiteboard data from Firebase
     }
 }
