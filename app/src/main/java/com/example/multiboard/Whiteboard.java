@@ -8,9 +8,11 @@ public class Whiteboard {
 
     private final static int WIDTH = 5000;
     private final static int HEIGHT = 5000;
+    public final static int MAX_INK = 150;
 
     private String mName; // Unique name representing this Whiteboard
-    private Pixel[][] mBoard = new Pixel[WIDTH][HEIGHT]; // The board data itself
+    private Pixel[][] mBoard; // The board data itself
+    public int mInkLevel;
 
     // TODO Whiteboard GPS location and GeoFence structure, getters and setters
 
@@ -20,6 +22,7 @@ public class Whiteboard {
      */
     public Whiteboard(String name) {
         mName = name;
+        mInkLevel = 0;
     }
 
     /**

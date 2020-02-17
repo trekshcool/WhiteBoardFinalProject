@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-->Defines a card for a Whiteboard listing in the main list activity<!-->
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:layout_margin="@dimen/card_margin"
+    app:cardBackgroundColor="@color/color_card"
+    app:cardCornerRadius="@dimen/card_corner_radius"
+    app:cardElevation="@dimen/card_elevation"
+    app:cardMaxElevation="@dimen/card_max_elevation"
+    android:focusable="true"
+    android:clickable="true"
+    android:onClick="cardClick"
+    />

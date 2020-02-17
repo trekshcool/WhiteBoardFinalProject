@@ -2,10 +2,14 @@ package com.example.multiboard;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -13,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -36,7 +41,11 @@ public class MainActivity extends AppCompatActivity {
     private int mUserId;
     private String mUserSalt;
 
-    private List<Whiteboard> mWhiteboardList;
+    // GUI variables
+    LinearLayout linearWhiteboards;
+
+    // Map of all present Whiteboards to their card views
+    private HashMap<Whiteboard, View> mWhiteboardMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,8 +85,28 @@ public class MainActivity extends AppCompatActivity {
         // Other Firebase
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
 
+        // Find views
+        linearWhiteboards = findViewById(R.id.linear_whiteboards);
+
         // Whiteboards
-        mWhiteboardList = new ArrayList<>();
+        mWhiteboardMap = new HashMap<>();
+        populateWhiteboardCards();
+    }
+
+    public void cardClick(View v) {
+        // TODO: Get Whiteboard and start whiteboard activity
+    }
+
+    /**
+     * Gets nearby Whiteboards and populates the layout and hashmap with their info.
+     */
+    private void populateWhiteboardCards() {
+        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        for (int i = 0; i < 15; i++) {
+            Whiteboard wb = new Whiteboard("test" + i);
+            View cardView = inflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards);
+            mWhiteboardMap.put(wb, cardView);
+        }
     }
 
     /**
