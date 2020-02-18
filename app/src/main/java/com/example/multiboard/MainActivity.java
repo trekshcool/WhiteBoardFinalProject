@@ -1,6 +1,8 @@
 package com.example.multiboard;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -67,9 +69,7 @@ import java.util.HashMap;
 public class MainActivity extends AppCompatActivity {
     private GeofencingClient geofencingClient;
     GoogleApiClient googleApiClient = null;
-    public static final String TAG = "MainActivity";
     public static final  String GEOFENCE_ID = "MyGeofenceId";
-
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private static final String TAG = "MainActivity";
@@ -116,6 +116,7 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onCancelled(@NonNull DatabaseError databaseError) {
             // Getting data failed
@@ -123,6 +124,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -251,6 +253,7 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Update Whiteboard distances
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onResume() {
         Log.d(TAG, "OnReume called");
@@ -266,6 +269,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onStart(){
         Log.d(TAG, "onStart called");
@@ -273,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
         googleApiClient.reconnect();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onStop(){
         Log.d(TAG, "onstop called");
@@ -280,6 +285,7 @@ public class MainActivity extends AppCompatActivity {
         googleApiClient.disconnect();
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void startLocationMonitoring(){
         Log.d(TAG, "startLocation called");
         try{
@@ -299,6 +305,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private void startGeoFenceMonitoring(){
         Log.e(TAG, "StartMonitoring Called");
         try{
@@ -339,6 +346,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     private  void stopGeoFenceMonitoring(){
         Log.d(TAG, "StopMoniotring Called");
         ArrayList<String> geofenceIds = new ArrayList<String>();
