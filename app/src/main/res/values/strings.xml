@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">Multiboard</string>
+    <string name="text_sign_in">Sign in with Google to start using Multiboard!</string>
+    <string name="text_card_name">Whiteboard Name</string>
+    <string name="text_card_dist">Distance:</string>
+    <string name="text_card_ink_level">Ink level:</string>
 </resources>
