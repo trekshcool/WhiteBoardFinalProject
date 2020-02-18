@@ -17,17 +17,35 @@ public class Whiteboard {
 
     private String mName; // Unique name representing this Whiteboard
     private Pixel[][] mBoard; // The board data itself
+    private float mLatitude; // Coordinates for the centroid
+    private float mLongitude;
+    private float mRadius; // Radius of geofence circle
     private int mInkLevel;
 
     // TODO Whiteboard GPS location and GeoFence structure, getters and setters
 
     /**
-     * Constructs a Whiteboard with the given name.
-     * @param name the name for this Whiteboard. (All Whiteboards must have a name).
+     * Construct an empty Whiteboard.
      */
-    public Whiteboard(String name) {
+    public Whiteboard() {
+        mName = "no_name";
+        mLatitude = 0;
+        mLongitude = 0;
+        mRadius = 1;
+    }
+
+    /**
+     * Construct a Whiteboard with the given information.
+     * @param name the Whiteboard's name.
+     * @param latitude the latitude coordinate of the location.
+     * @param longitude the longitude coordinate of the location.
+     * @param radius the radius of the geofence.
+     */
+    public Whiteboard(String name, float latitude, float longitude, float radius) {
         mName = name;
-        mInkLevel = 0;
+        mLatitude = latitude;
+        mLongitude = longitude;
+        mRadius = radius;
     }
 
     /**
@@ -66,11 +84,35 @@ public class Whiteboard {
         mName = name;
     }
 
-    public int getInkLevel() {
+    public float getLatitude() {
+        return mLatitude;
+    }
+
+    public void setLatitude(float mLatitude) {
+        this.mLatitude = mLatitude;
+    }
+
+    public float getLongitude() {
+        return mLongitude;
+    }
+
+    public void setLongitude(float mLongitude) {
+        this.mLongitude = mLongitude;
+    }
+
+    public float getRadius() {
+        return mRadius;
+    }
+
+    public void setRadius(float mRadius) {
+        this.mRadius = mRadius;
+    }
+
+    int getInkLevel() {
         return mInkLevel;
     }
 
-    public void setInkLevel(int inkLevel) {
+    void setInkLevel(int inkLevel) {
         mInkLevel = inkLevel;
     }
 

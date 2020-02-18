@@ -1,5 +1,6 @@
 package com.example.multiboard;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
@@ -9,18 +10,17 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     // Shared Preferences variables
     private SharedPreferences mSharedPreferences;
-    private String sharedPrefFile = "com.example.multiboard";
+    private String mSharedPrefFile = "com.example.multiboard";
 
     // Firebase variables
     private FirebaseAuth mFirebaseAuth;
@@ -39,10 +39,41 @@ public class MainActivity extends AppCompatActivity {
     private int mUserId;
 
     // GUI variables
+    LayoutInflater mInflater;
     LinearLayout linearWhiteboards;
 
     // Map of all present Whiteboards to their card views
     private HashMap<Whiteboard, View> mWhiteboardMap;
+
+    // Callbacks for Firebase updates
+    ValueEventListener whiteboardListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            // Iterate over all modified whiteboards
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                // Get Whiteboard object from database
+                Whiteboard wb = ds.getValue(Whiteboard.class);
+
+                // Add list card
+                View cardView = mInflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards, false);
+                linearWhiteboards.addView(cardView);
+                mWhiteboardMap.put(wb, cardView);
+
+                // Fill in information on the new list card
+                try {
+                    wb.setupListCard(getBaseContext(), cardView);
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            // Getting data failed
+            Log.w(TAG, databaseError.toException());
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,10 +81,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // SharedPreferences initialization/restoration
-        mSharedPreferences = getSharedPreferences(sharedPrefFile, MODE_PRIVATE);
+        mSharedPreferences = getSharedPreferences(mSharedPrefFile, MODE_PRIVATE);
 
         // Initialize user ID
         mUserId = 0;
+
+        // Find views
+        linearWhiteboards = findViewById(R.id.linear_whiteboards);
+        mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -74,13 +109,10 @@ public class MainActivity extends AppCompatActivity {
 
         // Other Firebase
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-
-        // Find views
-        linearWhiteboards = findViewById(R.id.linear_whiteboards);
+        mFirebaseDatabaseReference.child("whiteboards").addValueEventListener(whiteboardListener);
 
         // Whiteboards
         mWhiteboardMap = new HashMap<>();
-        populateWhiteboardCards();
     }
 
     public void cardClick(View v) {
@@ -88,21 +120,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Gets nearby Whiteboards and populates the layout and hashmap with their info.
+     * Updates the distance reading for Whiteboard list cards.
      */
-    private void populateWhiteboardCards() {
-        // Test code
-        LayoutInflater inflater = (LayoutInflater)
-                this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        for (int i = 0; i < 15; i++) {
-            Whiteboard wb = new Whiteboard("test" + i);
-            View cardView = inflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards, false);
-            linearWhiteboards.addView(cardView);
-            wb.setupListCard(this, cardView);
-            mWhiteboardMap.put(wb, cardView);
-        }
-
-        // TODO: Retrieve Whiteboard data from Firebase
+    private void updateDistances() {
+        // TODO: Update Whiteboard distances
     }
 }
