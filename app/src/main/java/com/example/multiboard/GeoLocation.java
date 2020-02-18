@@ -5,9 +5,9 @@ public class GeoLocation {
     private String name;
     private double lat;
     private double lon;
-    private double radius;
+    private float radius;
 
-    public GeoLocation(String name, double lat, double lon, double radius){
+    public GeoLocation(String name, double lat, double lon, float radius){
         this.name = name;
         this.lat = lat;
         this.lon = lon;
@@ -26,7 +26,7 @@ public class GeoLocation {
         return lon;
     }
 
-    public double getRadius(){
+    public float getRadius(){
         return radius;
     }
 }

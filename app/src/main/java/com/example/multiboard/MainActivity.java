@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity {
     private GeofencingClient geofencingClient;
     GoogleApiClient googleApiClient = null;
     public static final  String GEOFENCE_ID = "MyGeofenceId";
+    private GeoLocations geoLocations = new GeoLocations(); // hold locations for Fence to use
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     private static final String TAG = "MainActivity";
@@ -165,6 +166,7 @@ public class MainActivity extends AppCompatActivity {
         mWhiteboardMap = new HashMap<>();
         geofencingClient = LocationServices.getGeofencingClient(this);
 
+        //create Api Client
         googleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
@@ -286,7 +288,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void startLocationMonitoring(){
+    private void startLocationMonitoring(){// find users location
         Log.d(TAG, "startLocation called");
         try{
             LocationRequest locationRequest = LocationRequest.create()
@@ -306,40 +308,75 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void startGeoFenceMonitoring(){
+    private void startGeoFenceMonitoring(){ //if your in a fence location
         Log.e(TAG, "StartMonitoring Called");
         try{
             //googleApiClient.connect();
 
-            Geofence geofence = new Geofence.Builder()
-                    .setRequestId(GEOFENCE_ID)
-                    .setCircularRegion(33, -84, 100)
-                    .setExpirationDuration(NEVER_EXPIRE)
-                    .setNotificationResponsiveness(1000)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .build();
 
-            GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
-                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                    .addGeofence(geofence).build();
+//            //example fence
+//            Geofence geofence = new Geofence.Builder()
+//                    .setRequestId(GEOFENCE_ID)
+//                    .setCircularRegion(33, -84, 100)
+//                    .setExpirationDuration(NEVER_EXPIRE)
+//                    .setNotificationResponsiveness(1000)
+//                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+//                    .build();
 
-            Intent intent = new Intent(this, GeofenceService.class);
-            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        if(!googleApiClient.isConnected()){
-            Log.d(TAG, "GoogleApiClient is not connected");
-        } else {
-            LocationServices.GeofencingApi.addGeofences(googleApiClient, geofenceRequest, pendingIntent)
-                    .setResultCallback(new ResultCallback<Status>() {
-                        @Override
-                        public void onResult(@NonNull Status status) {
-                            if (status.isSuccess()){
-                                Log.d(TAG, "succefuly added geofence");
-                            } else {
-                                Log.d(TAG, "Failed to add Geofence" + status.getStatus());
-                            }
-                        }
-                    });
-        }
+//            GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
+//                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+//                    .addGeofence(geofence).build();
+
+
+//            Intent intent = new Intent(this, GeofenceService.class);
+//            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//
+//            if(!googleApiClient.isConnected()){
+//                Log.d(TAG, "GoogleApiClient is not connected");
+//            } else {
+//                LocationServices.GeofencingApi.addGeofences(googleApiClient, geofenceRequest, pendingIntent)
+//                        .setResultCallback(new ResultCallback<Status>() {
+//                            @Override
+//                            public void onResult(@NonNull Status status) {
+//                                if (status.isSuccess()){
+//                                    Log.d(TAG, "succefuly added geofence");
+//                                } else {
+//                                    Log.d(TAG, "Failed to add Geofence" + status.getStatus());
+//                                }
+//                            }
+//                        });
+//            }
+//
+            List<Geofence> geofences = getGeofenceList(geoLocations.getLocations());
+
+
+            for (Geofence geofence : geofences) {
+
+                //make request for each fence?
+                GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
+                        .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                        .addGeofence(geofence).build();
+
+                //make pendingIntent
+                Intent intent = new Intent(this, GeofenceService.class);
+                PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+                if(!googleApiClient.isConnected()){
+                    Log.d(TAG, "GoogleApiClient is not connected");
+                } else { // LocationServices add fence to LocationServices
+                    LocationServices.GeofencingApi.addGeofences(googleApiClient, geofenceRequest, pendingIntent)
+                            .setResultCallback(new ResultCallback<Status>() {
+                                @Override
+                                public void onResult(@NonNull Status status) {
+                                    if (status.isSuccess()){
+                                        Log.d(TAG, "succefuly added geofence");
+                                    } else {
+                                        Log.d(TAG, "Failed to add Geofence" + status.getStatus());
+                                    }
+                                }
+                            });
+                }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -355,29 +392,31 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    //Create a list of
-    private static List<Geofence> getGeofenceList(List<Place> places) {
+    //Create a list of fences
+    private static List<Geofence> getGeofenceList(List<GeoLocation> geoLocationList) {
         List<Geofence> geofenceList = new ArrayList<>();
 
-        for (Place place : places){
+        for (GeoLocation geoLocation : geoLocationList){
             geofenceList.add(new Geofence.Builder()
                     // Set the request ID of the geofence. This is a string to identify this
                     // geofence.
-                    .setRequestId(String.valueOf(place.getId()))
+                    //.setRequestId(String.valueOf(place.getId()))
+                    .setRequestId(geoLocation.getName())
                     .setCircularRegion(
-                            place.getLatLng().latitude,
-                            place.getLatLng().longitude,
-                            place.getRating() // Radius??
+                            geoLocation.getLat(),
+                            geoLocation.getLon(),
+                            geoLocation.getRadius()
+//                            place.getLatLng().latitude,
+//                            place.getLatLng().longitude,
+//                            place.getRating() // Radius??
                     )
                     .setExpirationDuration(NEVER_EXPIRE)
                     .setNotificationResponsiveness(1000)
-                    //.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                     //.setLoiteringDelay(LOITERING_DWELL_DELAY)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)
                     //.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)
                     .build());
         }
-
         return geofenceList;
     }
 
