@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -91,10 +92,14 @@ public class MainActivity extends AppCompatActivity {
      */
     private void populateWhiteboardCards() {
         // Test code
-        LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        LayoutInflater inflater = (LayoutInflater)
+                this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
         for (int i = 0; i < 15; i++) {
             Whiteboard wb = new Whiteboard("test" + i);
-            View cardView = inflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards);
+            View cardView = inflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards, false);
+            linearWhiteboards.addView(cardView);
+            wb.setupListCard(this, cardView);
             mWhiteboardMap.put(wb, cardView);
         }
 

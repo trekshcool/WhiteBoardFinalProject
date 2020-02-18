@@ -1,17 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-->Defines a card for a Whiteboard listing in the main list activity<!-->
-<androidx.cardview.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
+    android:layout_height="wrap_content"
     android:layout_margin="@dimen/card_margin"
+    android:clickable="true"
+    android:focusable="true"
+    android:onClick="cardClick"
     app:cardBackgroundColor="@color/color_card"
     app:cardCornerRadius="@dimen/card_corner_radius"
     app:cardElevation="@dimen/card_elevation"
-    app:cardMaxElevation="@dimen/card_max_elevation"
-    android:focusable="true"
-    android:clickable="true"
-    android:onClick="cardClick"
-    />
+    app:cardMaxElevation="@dimen/card_max_elevation">
+
+    <LinearLayout
+        android:id="@+id/linear_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/card_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/text_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/text_card_name"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <TextView
+            android:id="@+id/text_ink_level"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text_card_ink_level" />
+
+        <TextView
+            android:id="@+id/text_dist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/text_card_dist" />
+    </LinearLayout>
+
+</androidx.cardview.widget.CardView>
