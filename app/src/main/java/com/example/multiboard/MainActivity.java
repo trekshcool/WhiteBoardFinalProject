@@ -381,7 +381,7 @@ public class MainActivity extends AppCompatActivity {
         List<Geofence> geofenceList = new ArrayList<>();
 
         for (Whiteboard wb : mWhiteboardMap.keySet()){
-            geofenceList.add(new Geofence.Builder()
+             Geofence geofence = new Geofence.Builder()
                     // Set the request ID of the geofence. This is a string to identify this geofence.
                     .setRequestId(wb.getName())
                     .setCircularRegion(
@@ -392,8 +392,10 @@ public class MainActivity extends AppCompatActivity {
                     .setExpirationDuration(NEVER_EXPIRE)
                     .setNotificationResponsiveness(1000)
                     //.setLoiteringDelay(LOITERING_DWELL_DELAY)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)
-                    .build());
+                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                    .build();
+             // TODO: Add geofence event callbacks
+             geofenceList.add(geofence);
         }
         return geofenceList;
     }
