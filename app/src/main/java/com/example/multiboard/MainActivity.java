@@ -286,7 +286,7 @@ public class MainActivity extends AppCompatActivity {
         super.onStop();
         googleApiClient.disconnect();
     }
-
+/*
     @RequiresApi(api = Build.VERSION_CODES.M)
     private void startLocationMonitoring(){// find users location
         Log.d(TAG, "startLocation called");
@@ -306,15 +306,15 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "SecurityExecption - " + e.getMessage());
         }
     }
+*/
+
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private void startGeoFenceMonitoring(){ //if your in a fence location
+    private void startGeoFenceMonitoring(){ //setup checking if your in a fence location
         Log.e(TAG, "StartMonitoring Called");
         try{
             //googleApiClient.connect();
-
-
-//            //example fence
+/*            //example fence
 //            Geofence geofence = new Geofence.Builder()
 //                    .setRequestId(GEOFENCE_ID)
 //                    .setCircularRegion(33, -84, 100)
@@ -322,12 +322,13 @@ public class MainActivity extends AppCompatActivity {
 //                    .setNotificationResponsiveness(1000)
 //                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
 //                    .build();
-
+*/
+/*
 //            GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
 //                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
 //                    .addGeofence(geofence).build();
-
-
+*/
+/*
 //            Intent intent = new Intent(this, GeofenceService.class);
 //            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 //
@@ -346,7 +347,7 @@ public class MainActivity extends AppCompatActivity {
 //                            }
 //                        });
 //            }
-//
+*/
             List<Geofence> geofences = getGeofenceList(geoLocations.getLocations());
 
 
@@ -384,10 +385,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private  void stopGeoFenceMonitoring(){
+    private  void stopGeoFenceMonitoring(String fenceID){ //remove a fence form checking
         Log.d(TAG, "StopMoniotring Called");
         ArrayList<String> geofenceIds = new ArrayList<String>();
-        geofenceIds.add(GEOFENCE_ID);
+        //geofenceIds.add(GEOFENCE_ID);
+        geofenceIds.add(fenceID);
         LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceIds);
     }
 
