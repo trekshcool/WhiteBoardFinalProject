@@ -4,24 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
-import android.app.IntentService;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.location.Location;
-import android.nfc.Tag;
 import android.os.Build;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.provider.SyncStateContract;
-import android.util.Log;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,28 +20,19 @@ import android.widget.LinearLayout;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.Api;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
-import com.google.android.gms.common.api.ResultCallback;
-import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingClient;
+import com.google.android.gms.location.GeofencingEvent;
 import com.google.android.gms.location.GeofencingRequest;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.places.Place;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 
-import java.io.FileDescriptor;
-import java.io.PrintWriter;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER;
+import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 
 /**
@@ -72,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
     public static final  String GEOFENCE_ID = "MyGeofenceId";
     private GeoLocations geoLocations = new GeoLocations(); // hold locations for Fence to use
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private static final String TAG = "MainActivity";
 
     // Shared Preferences variables
@@ -92,7 +73,10 @@ public class MainActivity extends AppCompatActivity {
     LinearLayout linearWhiteboards;
 
     // Map of all present Whiteboards to their card views
-    private HashMap<Whiteboard, View> mWhiteboardMap;
+    private HashMap<Whiteboard, View> mListCardMap;
+
+    // Map of all geofences to their respective Whiteboards
+    private HashMap<Geofence, Whiteboard> mWhiteboardFencesMap;
 
     // Callbacks for Firebase updates
     ValueEventListener whiteboardListener = new ValueEventListener() {
@@ -106,7 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 // Add list card
                 View cardView = mInflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards, false);
                 linearWhiteboards.addView(cardView);
-                mWhiteboardMap.put(wb, cardView);
+                mListCardMap.put(wb, cardView);
 
                 // Fill in information on the new list card
                 try {
@@ -163,7 +147,7 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseDatabaseReference.child("whiteboards").addValueEventListener(whiteboardListener);
 
         // Whiteboards
-        mWhiteboardMap = new HashMap<>();
+        mListCardMap = new HashMap<>();
         geofencingClient = LocationServices.getGeofencingClient(this);
 
         //create Api Client
@@ -189,8 +173,6 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
-
-
 
 
 //        //create geofence
@@ -335,39 +317,31 @@ public class MainActivity extends AppCompatActivity {
 
             for (Geofence geofence : geofences) {
 
-                //make request for each fence?
+                // Make request for each fence
                 GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
                         .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
                         .addGeofence(geofence).build();
 
-                //make pendingIntent
-                Intent intent = new Intent(this, GeofenceService.class);
-                PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+                // Make pendingIntent
+                Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
                 if(!googleApiClient.isConnected()){
                     Log.d(TAG, "GoogleApiClient is not connected");
-                } else { // LocationServices add fence to LocationServices
-                    LocationServices.GeofencingApi.addGeofences(googleApiClient, geofenceRequest, pendingIntent)
-                            .setResultCallback(new ResultCallback<Status>() {
-                                @Override
-                                public void onResult(@NonNull Status status) {
-                                    if (status.isSuccess()){
-                                        Log.d(TAG, "succefuly added geofence");
-                                    } else {
-                                        Log.d(TAG, "Failed to add Geofence" + status.getStatus());
-                                    }
-                                }
-                            });
+                } else {
+                    // Add geofences to pending intent to listen for geofencing triggers
+                    geofencingClient.addGeofences(geofenceRequest, pendingIntent);
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
-    private  void stopGeoFenceMonitoring(String fenceID){ //remove a fence form checking
+    private void stopGeoFenceMonitoring(String fenceID){ //remove a fence form checking
         Log.d(TAG, "StopMoniotring Called");
         ArrayList<String> geofenceIds = new ArrayList<String>();
         //geofenceIds.add(GEOFENCE_ID);
@@ -380,8 +354,8 @@ public class MainActivity extends AppCompatActivity {
     private  List<Geofence> getGeofenceList() {
         List<Geofence> geofenceList = new ArrayList<>();
 
-        for (Whiteboard wb : mWhiteboardMap.keySet()){
-             Geofence geofence = new Geofence.Builder()
+        for (Whiteboard wb : mListCardMap.keySet()){
+            Geofence geofence = new Geofence.Builder()
                     // Set the request ID of the geofence. This is a string to identify this geofence.
                     .setRequestId(wb.getName())
                     .setCircularRegion(
@@ -394,26 +368,45 @@ public class MainActivity extends AppCompatActivity {
                     //.setLoiteringDelay(LOITERING_DWELL_DELAY)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                     .build();
-             // TODO: Add geofence event callbacks
-             geofenceList.add(geofence);
+
+            geofenceList.add(geofence);
+            mWhiteboardFencesMap.put(geofence, wb);
         }
         return geofenceList;
     }
 
+    /**
+     * Defines the behavior for geofence events received from the geofencing PendingIntent
+     */
+    private class GeofenceBroadcastReceiver extends BroadcastReceiver {
 
-//
-//    private PendingIntent getGeofencePendingIntent() {
-//        // Reuse the PendingIntent if we already have it.
-//        if (geofencePendingIntent != null) {
-//            return geofencePendingIntent;
-//        }
-//        Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
-//        // We use FLAG_UPDATE_CURRENT so that we get the same pending intent back when
-//        // calling addGeofences() and removeGeofences().
-//        geofencePendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.
-//                FLAG_UPDATE_CURRENT);
-//        return geofencePendingIntent;
-//    }
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get GeofenceEvent
+            GeofencingEvent ev = GeofencingEvent.fromIntent(intent);
+
+            // Check for errors
+            if (ev.hasError()) {
+                String errorMessage = GeofenceStatusCodes.getStatusCodeString(ev.getErrorCode());
+                Log.e(TAG, errorMessage);
+                return;
+            }
+
+            // Perform task based on transition type
+            switch (ev.getGeofenceTransition()) {
+                case GEOFENCE_TRANSITION_ENTER:
+                    for (Geofence geofence : ev.getTriggeringGeofences()) {
+                        mWhiteboardFencesMap.get(geofence).activate();
+                    }
+                    break;
+                case GEOFENCE_TRANSITION_EXIT:
+                    for (Geofence geofence : ev.getTriggeringGeofences()) {
+                        mWhiteboardFencesMap.get(geofence).deactivate();
+                    }
+                    break;
+            }
+        }
+    }
 }
 
 

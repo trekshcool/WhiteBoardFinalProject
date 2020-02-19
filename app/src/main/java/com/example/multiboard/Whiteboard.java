@@ -76,6 +76,14 @@ public class Whiteboard {
         ((TextView) view.findViewById(R.id.text_ink_level)).setText(inkMessage);
     }
 
+    public void activate() {
+        // TODO: Make clickable and bright
+    }
+
+    public void deactivate() {
+        // TODO: Make un-clickable and grayed
+    }
+
     public String getName() {
         return mName;
     }
