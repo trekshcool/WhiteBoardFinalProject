@@ -322,13 +322,10 @@ public class MainActivity extends AppCompatActivity {
 //                    .setNotificationResponsiveness(1000)
 //                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
 //                    .build();
-*/
-/*
+//
 //            GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
 //                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
 //                    .addGeofence(geofence).build();
-*/
-/*
 //            Intent intent = new Intent(this, GeofenceService.class);
 //            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 //
@@ -348,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
 //                        });
 //            }
 */
-            List<Geofence> geofences = getGeofenceList(geoLocations.getLocations());
+            List<Geofence> geofences = getGeofenceList();
 
 
             for (Geofence geofence : geofences) {
@@ -395,47 +392,28 @@ public class MainActivity extends AppCompatActivity {
 
 
     //Create a list of fences
-    private static List<Geofence> getGeofenceList(List<GeoLocation> geoLocationList) {
+    private  List<Geofence> getGeofenceList() {
         List<Geofence> geofenceList = new ArrayList<>();
 
-        for (GeoLocation geoLocation : geoLocationList){
+        for (Whiteboard wb : mWhiteboardMap.keySet()){
             geofenceList.add(new Geofence.Builder()
-                    // Set the request ID of the geofence. This is a string to identify this
-                    // geofence.
-                    //.setRequestId(String.valueOf(place.getId()))
-                    .setRequestId(geoLocation.getName())
+                    // Set the request ID of the geofence. This is a string to identify this geofence.
+                    .setRequestId(wb.getName())
                     .setCircularRegion(
-                            geoLocation.getLat(),
-                            geoLocation.getLon(),
-                            geoLocation.getRadius()
-//                            place.getLatLng().latitude,
-//                            place.getLatLng().longitude,
-//                            place.getRating() // Radius??
+                            wb.getLatitude(),
+                            wb.getLongitude(),
+                            wb.getRadius()
                     )
                     .setExpirationDuration(NEVER_EXPIRE)
                     .setNotificationResponsiveness(1000)
                     //.setLoiteringDelay(LOITERING_DWELL_DELAY)
                     .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)
-                    //.setTransitionTypes(Geofence.GEOFENCE_TRANSITION_EXIT | Geofence.GEOFENCE_TRANSITION_DWELL)
                     .build());
         }
         return geofenceList;
     }
 
 
-//    //demo Geofencie,  triggers
-//    private GeofencingRequest getGeofencingRequest() {
-//        GeofencingRequest.Builder builder = new GeofencingRequest.Builder();
-//        builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER);//trigger while divice is in the area
-//        builder.addGeofences(geofenceList);
-//        return builder.build();
-//
-//
-//        // builder.setInitialTrigger(GeofencingRequest.GEOFENCE_TRANSITION_ENTER);//trigger when divice enter area
-//        // builder.setInitialTrigger(GeofencingRequest.GEOFENCE_TRANSITION_EXIT); // trigger on exit
-//        // builder.setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_DWELL); // trigger while still in area
-//
-//    }
 //
 //    private PendingIntent getGeofencePendingIntent() {
 //        // Reuse the PendingIntent if we already have it.
