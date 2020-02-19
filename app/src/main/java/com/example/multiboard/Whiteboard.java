@@ -21,6 +21,7 @@ public class Whiteboard {
     private float mLongitude;
     private float mRadius; // Radius of geofence circle
     private int mInkLevel;
+    private View mCardView; // CardView in list of Whiteboards
 
     // TODO Whiteboard GPS location and GeoFence structure, getters and setters
 
@@ -70,6 +71,7 @@ public class Whiteboard {
      */
     public void setupListCard(Context context, View view) {
         // Set Whiteboard text views
+        mCardView = view;
         ((TextView) view.findViewById(R.id.text_name)).setText(getName());
         int inkLevel = getInkLevel() * 100 / Whiteboard.MAX_INK;
         String inkMessage = context.getString(R.string.text_card_ink_level) + " " + inkLevel + "%";
@@ -78,10 +80,12 @@ public class Whiteboard {
 
     public void activate() {
         // TODO: Make clickable and bright
+        ((TextView) mCardView.findViewById(R.id.text_ink_level)).setText("Available");
     }
 
     public void deactivate() {
         // TODO: Make un-clickable and grayed
+        ((TextView) mCardView.findViewById(R.id.text_ink_level)).setText("Unavailable");
     }
 
     public String getName() {
