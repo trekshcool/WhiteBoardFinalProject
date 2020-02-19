@@ -192,21 +192,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-//        //demo geofence, get user location
-//        geofenceList.add(new Geofence.Builder()
-//                // Set the request ID of the geofence. This is a string to identify this
-//                // geofence.
-//                .setRequestId(entry.getKey())
-//
-//                .setCircularRegion(
-//                        entry.getValue().latitude,
-//                        entry.getValue().longitude,
-//                        SyncStateContract.Constants.GEOFENCE_RADIUS_IN_METERS
-//                )
-//                .setExpirationDuration(SyncStateContract.Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
-//                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER |
-//                        Geofence.GEOFENCE_TRANSITION_EXIT)
-//                .build());
 
 //        //create geofence
 //        geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
