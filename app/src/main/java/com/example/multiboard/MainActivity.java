@@ -4,11 +4,16 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Build;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -98,6 +103,8 @@ public class MainActivity extends AppCompatActivity {
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
+
+                startGeoFenceMonitoring();
             }
         }
 
@@ -148,6 +155,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Whiteboards
         mListCardMap = new HashMap<>();
+        mWhiteboardFencesMap = new HashMap<>();
         geofencingClient = LocationServices.getGeofencingClient(this);
 
         //create Api Client
@@ -173,6 +181,16 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
+
+        // Location testing
+        LocationManager locationManager = (LocationManager)
+                getSystemService(Context.LOCATION_SERVICE);
+        LocationListener locationListener = new MyLocationListener();
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationManager.requestLocationUpdates(
+                    LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+        }
 
 
 //        //create geofence
@@ -209,6 +227,14 @@ public class MainActivity extends AppCompatActivity {
 //            // Background location runtime permission already granted.
 //            // You can now call geofencingClient.addGeofences().
 //        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        for (Geofence geofence : mWhiteboardFencesMap.keySet()) {
+            //stopGeoFenceMonitoring(geofence.getRequestId());
+        }
     }
 
     public void cardClick(View v) {
@@ -276,7 +302,6 @@ public class MainActivity extends AppCompatActivity {
 */
 
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void startGeoFenceMonitoring(){ //setup checking if your in a fence location
         Log.e(TAG, "StartMonitoring Called");
         try{
@@ -340,7 +365,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     private void stopGeoFenceMonitoring(String fenceID){ //remove a fence form checking
         Log.d(TAG, "StopMoniotring Called");
         ArrayList<String> geofenceIds = new ArrayList<String>();
@@ -353,6 +377,10 @@ public class MainActivity extends AppCompatActivity {
     //Create a list of fences
     private  List<Geofence> getGeofenceList() {
         List<Geofence> geofenceList = new ArrayList<>();
+
+        if (mListCardMap.isEmpty()) {
+            return null;
+        }
 
         for (Whiteboard wb : mListCardMap.keySet()){
             Geofence geofence = new Geofence.Builder()
@@ -372,6 +400,7 @@ public class MainActivity extends AppCompatActivity {
             geofenceList.add(geofence);
             mWhiteboardFencesMap.put(geofence, wb);
         }
+
         return geofenceList;
     }
 
@@ -398,14 +427,34 @@ public class MainActivity extends AppCompatActivity {
                     for (Geofence geofence : ev.getTriggeringGeofences()) {
                         mWhiteboardFencesMap.get(geofence).activate();
                     }
+                    Log.d(TAG, "Entered fence.");
                     break;
                 case GEOFENCE_TRANSITION_EXIT:
                     for (Geofence geofence : ev.getTriggeringGeofences()) {
                         mWhiteboardFencesMap.get(geofence).deactivate();
                     }
+                    Log.d(TAG, "Exited fence.");
                     break;
             }
         }
+    }
+
+    /*---------- Listener class to get coordinates ------------- */
+    private class MyLocationListener implements LocationListener {
+
+        @Override
+        public void onLocationChanged(Location loc) {
+            Log.d(TAG, "LAT: " + loc.getLatitude() + "LON: " + loc.getLongitude());
+        }
+
+        @Override
+        public void onProviderDisabled(String provider) {}
+
+        @Override
+        public void onProviderEnabled(String provider) {}
+
+        @Override
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
     }
 }
 
