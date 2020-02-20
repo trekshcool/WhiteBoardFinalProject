@@ -35,9 +35,6 @@ import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
 import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 
-/**
- * This Activity is the default starting place for the app and allows the user to sign in.
- */
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -48,6 +45,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.HashMap;
 
+/**
+ * This Activity is the default starting place for the app and allows the user to sign in.
+ */
 public class MainActivity extends AppCompatActivity {
     private GeofencingClient geofencingClient;
     GoogleApiClient googleApiClient = null;
@@ -172,7 +172,7 @@ public class MainActivity extends AppCompatActivity {
                 })
                 .build();
         requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
-            Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
+                Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
 
 
 //        //create geofence
