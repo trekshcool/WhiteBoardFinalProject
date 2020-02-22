@@ -200,15 +200,26 @@ public class MainActivity extends AppCompatActivity {
 ​
         // Begin realtime update listening
         startLocationUpdates();
-    }
 
+        // Create callback function for realtime location results
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location loc : locationResult.getLocations()) {
+                    updateCurLoc(loc);
+                }
+            }
+        };
 
-    //create Api Client
-    googleApiClient = new GoogleApiClient.Builder(this)
-            .addApi(LocationServices.API).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+        //create Api Client
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(@Nullable Bundle bundle) {
-                       Log.d(TAG, "Connected to GoogleApiClient");
+                        Log.d(TAG, "Connected to GoogleApiClient");
                     }
 
                     @Override
@@ -226,53 +237,14 @@ public class MainActivity extends AppCompatActivity {
                 .build();
         requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
-
-        // Location testing
-        LocationManager locationManager = (LocationManager)
-                getSystemService(Context.LOCATION_SERVICE);
-        LocationListener locationListener = new MyLocationListener();
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
-                == PackageManager.PERMISSION_GRANTED) {
-            locationManager.requestLocationUpdates(
-                    LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
-        }
-        };
+    }
 
 
-//        //create geofence
-//        geofencingClient.addGeofences(getGeofencingRequest(), getGeofencePendingIntent())
-//                .addOnSuccessListener(this, new OnSuccessListener<Void>() {
-//                    @Override
-//                    public void onSuccess(Void aVoid) {
-//                        // Geofences added
-//                        // ...
-//                    }
-//                })
-//                .addOnFailureListener(this, new OnFailureListener() {
-//                    @Override
-//                    public void onFailure(@NonNull Exception e) {
-//                        // Failed to add geofences
-//                        // ...
-//                    }
-//                });
 
-//        // Required if your app targets Android 10 or higher.
-//        if (ContextCompat.checkSelfPermission(thisActivity,
-//                Manifest.permission.ACCESS_BACKGROUND_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            if (permissionRationaleAlreadyShown) {
-//                ActivityCompat.requestPermissions(thisActivity,
-//                        new String[] { Manifest.permission.ACCESS_BACKGROUND_LOCATION },
-//                        background-location-permission-request-code);
-//            } else {
-//                // Show an explanation to the user as to why your app needs the
-//                // permission. Display the explanation *asynchronously* -- don't block
-//                // this thread waiting for the user's response!
-//            }
-//        } else {
-//            // Background location runtime permission already granted.
-//            // You can now call geofencingClient.addGeofences().
-//        }
+
+
+
+
 
 
     @Override
@@ -359,7 +331,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void updateCurLoc(Location loc) {
         Log.d(TAG, "Updating");
-​
+        ​
         // Store the new location and display it on screen
         curLoc = loc;
         if (curLoc == null) {
@@ -378,7 +350,7 @@ public class MainActivity extends AppCompatActivity {
         LocationRequest locationRequest = new LocationRequest()
                 .setInterval(100)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-​
+
         // Begin the listener
         fusedLocationClient.requestLocationUpdates(
                 locationRequest,
