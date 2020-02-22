@@ -28,13 +28,8 @@ import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofenceStatusCodes;
-import com.google.android.gms.location.GeofencingClient;
-import com.google.android.gms.location.GeofencingEvent;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -42,10 +37,6 @@ import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER;
-import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT;
-import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -307,6 +298,31 @@ public class MainActivity extends AppCompatActivity {
                 Looper.getMainLooper()
         );
     }
+
+    //Debuger to find if near a white boead
+    private void nearWhiteboard(){
+        Log.d(TAG, "update location");
+
+        for (Whiteboard whiteboard: mListCardMap){
+
+            if (findDistace(
+                    curLoc.getLatitude(),curLoc.getLongitude(),
+                    whiteboard.getLatitude(), whiteboard.getLongitude())
+                    <= whiteboard.getRadius()){
+                Log.d(TAG, "within Area" + whiteboard.getName());
+            }
+        }
+    }
+
+
+    //calc distence form whiteBoard distacne. use pythagorean theorem and convert double to Float.
+    private float findDistace(double yourLatatude, double YourLaungatude, double whiteBoardLatatude, double whiteBoardLaungatude){
+        double latatude = Math.abs(yourLatatude - whiteBoardLatatude);
+        double laungatude = Math.abs(YourLaungatude - whiteBoardLaungatude);
+
+        return (float) Math.sqrt(Math.pow(latatude,2) + Math.pow(laungatude,2));
+    }
+
 
 
     /*---------- Listener class to get coordinates ------------- */
