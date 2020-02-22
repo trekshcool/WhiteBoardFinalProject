@@ -35,9 +35,6 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
@@ -77,7 +74,6 @@ public class MainActivity extends AppCompatActivity {
     Location curLoc;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
-
 
     // GUI variables
     LayoutInflater mInflater;
@@ -163,7 +159,6 @@ public class MainActivity extends AppCompatActivity {
         mListCardMap = new HashMap<>();
         mWhiteboardFencesMap = new HashMap<>();
 
-
         // Create callback function for realtime location results
         locationCallback = new LocationCallback() {
             @Override
@@ -187,7 +182,6 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-
         //Begin Realtime update Listenering
         startLocationUpdates();
 
@@ -203,11 +197,9 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         };
-
         requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
     }
-
 
     @Override
     protected void onDestroy() {
@@ -267,7 +259,6 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
-
     @SuppressLint("SetTextI18n")
     public void updateCurLoc(Location loc) {
         Log.d(TAG, "Updating");
@@ -283,7 +274,6 @@ public class MainActivity extends AppCompatActivity {
             mTextView.setText(message);
         }
     }
-
 
     public void startLocationUpdates() {
         // Request for location
@@ -303,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
     private void nearWhiteboard(){
         Log.d(TAG, "update location");
 
-        for (Whiteboard whiteboard: mListCardMap){
+        for (Whiteboard whiteboard: mListCardMap.keySet()){
 
             if (findDistace(
                     curLoc.getLatitude(),curLoc.getLongitude(),
@@ -314,7 +304,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
     //calc distence form whiteBoard distacne. use pythagorean theorem and convert double to Float.
     private float findDistace(double yourLatatude, double YourLaungatude, double whiteBoardLatatude, double whiteBoardLaungatude){
         double latatude = Math.abs(yourLatatude - whiteBoardLatatude);
@@ -322,8 +311,6 @@ public class MainActivity extends AppCompatActivity {
 
         return (float) Math.sqrt(Math.pow(latatude,2) + Math.pow(laungatude,2));
     }
-
-
 
     /*---------- Listener class to get coordinates ------------- */
     private class MyLocationListener implements LocationListener {
