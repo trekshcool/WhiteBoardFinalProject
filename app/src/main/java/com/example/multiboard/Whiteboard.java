@@ -1,5 +1,6 @@
 package com.example.multiboard;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -77,6 +78,7 @@ public class Whiteboard {
         String inkMessage = context.getString(R.string.text_card_ink_level) + " " + inkLevel + "%";
         ((TextView) view.findViewById(R.id.text_ink_level)).setText(inkMessage);
     }
+
 
     public void activate() {
         // TODO: Make clickable and bright

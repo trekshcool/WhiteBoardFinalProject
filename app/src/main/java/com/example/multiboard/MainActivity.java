@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Intent;
@@ -47,6 +48,7 @@ import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -189,15 +191,16 @@ public class MainActivity extends AppCompatActivity {
 
         // Start the service by getting the current location once
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.getLastLocation()
+        Task<Location> locationTask = fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location loc) {
                         updateCurLoc(loc);
                     }
                 });
-​
-        // Begin realtime update listening
+
+
+        //Begin Realtime update Listenering
         startLocationUpdates();
 
         // Create callback function for realtime location results
@@ -300,10 +303,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @SuppressLint("SetTextI18n")
     public void updateCurLoc(Location loc) {
         Log.d(TAG, "Updating");
-        ​
-        // Store the new location and display it on screen
+
+        //Store the new Location and Display it on screen
         curLoc = loc;
         if (curLoc == null) {
             mTextView.setText("NULL location.");
