@@ -187,7 +187,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-
         // Start the service by getting the current location once
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         fusedLocationClient.getLastLocation()
@@ -238,13 +237,6 @@ public class MainActivity extends AppCompatActivity {
         requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
     }
-
-
-
-
-
-
-
 
 
     @Override
@@ -306,27 +298,6 @@ public class MainActivity extends AppCompatActivity {
         googleApiClient.disconnect();
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
-/*
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void startLocationMonitoring(){// find users location
-        Log.d(TAG, "startLocation called");
-        try{
-            LocationRequest locationRequest = LocationRequest.create()
-                    .setInterval(10000)
-                    .setFastestInterval(5000)
-                    //.set
-                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY); // eat more battory
-            LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    Log.d(TAG, "Location update lat/long " + location.getLatitude() + " " + location.getLongitude());
-                }
-            });
-        } catch (SecurityException e){
-            Log.e(TAG, "SecurityExecption - " + e.getMessage());
-        }
-    }
-*/
 
 
     public void updateCurLoc(Location loc) {
@@ -366,37 +337,6 @@ public class MainActivity extends AppCompatActivity {
         Log.e(TAG, "StartMonitoring Called");
         try{
             //googleApiClient.connect();
-/*            //example fence
-//            Geofence geofence = new Geofence.Builder()
-//                    .setRequestId(GEOFENCE_ID)
-//                    .setCircularRegion(33, -84, 100)
-//                    .setExpirationDuration(NEVER_EXPIRE)
-//                    .setNotificationResponsiveness(1000)
-//                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-//                    .build();
-//
-//            GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
-//                    .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-//                    .addGeofence(geofence).build();
-//            Intent intent = new Intent(this, GeofenceService.class);
-//            PendingIntent pendingIntent = PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//            if(!googleApiClient.isConnected()){
-//                Log.d(TAG, "GoogleApiClient is not connected");
-//            } else {
-//                LocationServices.GeofencingApi.addGeofences(googleApiClient, geofenceRequest, pendingIntent)
-//                        .setResultCallback(new ResultCallback<Status>() {
-//                            @Override
-//                            public void onResult(@NonNull Status status) {
-//                                if (status.isSuccess()){
-//                                    Log.d(TAG, "succefuly added geofence");
-//                                } else {
-//                                    Log.d(TAG, "Failed to add Geofence" + status.getStatus());
-//                                }
-//                            }
-//                        });
-//            }
-*/
             List<Geofence> geofences = getGeofenceList();
 
 
