@@ -63,8 +63,7 @@ import java.util.HashMap;
  * This Activity is the default starting place for the app and allows the user to sign in.
  */
 public class MainActivity extends AppCompatActivity {
-    private GeofencingClient geofencingClient;
-    GoogleApiClient googleApiClient = null;
+
     public static final  String GEOFENCE_ID = "MyGeofenceId";
     private GeoLocations geoLocations = new GeoLocations(); // hold locations for Fence to use
 
@@ -119,8 +118,6 @@ public class MainActivity extends AppCompatActivity {
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
-
-                startGeoFenceMonitoring();
             }
         }
 
@@ -174,7 +171,7 @@ public class MainActivity extends AppCompatActivity {
         // Whiteboards
         mListCardMap = new HashMap<>();
         mWhiteboardFencesMap = new HashMap<>();
-        geofencingClient = LocationServices.getGeofencingClient(this);
+
 
         // Create callback function for realtime location results
         locationCallback = new LocationCallback() {
@@ -216,27 +213,6 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
-        //create Api Client
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
-                    @Override
-                    public void onConnected(@Nullable Bundle bundle) {
-                        Log.d(TAG, "Connected to GoogleApiClient");
-                    }
-
-                    @Override
-                    public void onConnectionSuspended(int i) {
-                        Log.d(TAG, "Suspended connection to Google ApiClient");
-                    }
-
-
-                }).addOnConnectionFailedListener(new GoogleApiClient.OnConnectionFailedListener() {
-                    @Override
-                    public void onConnectionFailed(@NonNull ConnectionResult result) {
-                        Log.d(TAG, "Failed to connect ot googleapiClient- " + result.getErrorMessage());
-                    }
-                })
-                .build();
         requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
     }
@@ -290,7 +266,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart(){
         Log.d(TAG, "onStart called");
         super.onStart();
-        googleApiClient.reconnect();
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -298,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onStop(){
         Log.d(TAG, "onstop called");
         super.onStop();
-        googleApiClient.disconnect();
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
@@ -334,114 +308,6 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-
-
-
-    private void startGeoFenceMonitoring(){ //setup checking if your in a fence location
-        Log.e(TAG, "StartMonitoring Called");
-        try{
-            //googleApiClient.connect();
-            List<Geofence> geofences = getGeofenceList();
-
-
-            for (Geofence geofence : geofences) {
-
-                // Make request for each fence
-                GeofencingRequest geofenceRequest = new GeofencingRequest.Builder()
-                        .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                        .addGeofence(geofence).build();
-
-                // Make pendingIntent
-                Intent intent = new Intent(this, GeofenceBroadcastReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-
-                if(!googleApiClient.isConnected()){
-                    Log.d(TAG, "GoogleApiClient is not connected");
-                } else {
-                    // Add geofences to pending intent to listen for geofencing triggers
-                    geofencingClient.addGeofences(geofenceRequest, pendingIntent);
-                }
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void stopGeoFenceMonitoring(String fenceID){ //remove a fence form checking
-        Log.d(TAG, "StopMoniotring Called");
-        ArrayList<String> geofenceIds = new ArrayList<String>();
-        //geofenceIds.add(GEOFENCE_ID);
-        geofenceIds.add(fenceID);
-        LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceIds);
-    }
-
-
-    //Create a list of fences
-    private  List<Geofence> getGeofenceList() {
-        List<Geofence> geofenceList = new ArrayList<>();
-
-        if (mListCardMap.isEmpty()) {
-            return null;
-        }
-
-        for (Whiteboard wb : mListCardMap.keySet()){
-            Geofence geofence = new Geofence.Builder()
-                    // Set the request ID of the geofence. This is a string to identify this geofence.
-                    .setRequestId(wb.getName())
-                    .setCircularRegion(
-                            wb.getLatitude(),
-                            wb.getLongitude(),
-                            wb.getRadius()
-                    )
-                    .setExpirationDuration(NEVER_EXPIRE)
-                    .setNotificationResponsiveness(1000)
-                    //.setLoiteringDelay(LOITERING_DWELL_DELAY)
-                    .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                    .build();
-
-            geofenceList.add(geofence);
-            mWhiteboardFencesMap.put(geofence, wb);
-        }
-
-        return geofenceList;
-    }
-
-    /**
-     * Defines the behavior for geofence events received from the geofencing PendingIntent
-     */
-    private class GeofenceBroadcastReceiver extends BroadcastReceiver {
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get GeofenceEvent
-            GeofencingEvent ev = GeofencingEvent.fromIntent(intent);
-
-            // Check for errors
-            if (ev.hasError()) {
-                String errorMessage = GeofenceStatusCodes.getStatusCodeString(ev.getErrorCode());
-                Log.e(TAG, errorMessage);
-                return;
-            }
-
-            // Perform task based on transition type
-            switch (ev.getGeofenceTransition()) {
-                case GEOFENCE_TRANSITION_ENTER:
-                    for (Geofence geofence : ev.getTriggeringGeofences()) {
-                        mWhiteboardFencesMap.get(geofence).activate();
-                    }
-                    Log.d(TAG, "Entered fence.");
-                    break;
-                case GEOFENCE_TRANSITION_EXIT:
-                    for (Geofence geofence : ev.getTriggeringGeofences()) {
-                        mWhiteboardFencesMap.get(geofence).deactivate();
-                    }
-                    Log.d(TAG, "Exited fence.");
-                    break;
-            }
-        }
-    }
 
     /*---------- Listener class to get coordinates ------------- */
     private class MyLocationListener implements LocationListener {
