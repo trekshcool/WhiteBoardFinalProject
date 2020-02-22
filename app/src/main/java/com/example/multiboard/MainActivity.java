@@ -18,19 +18,25 @@ import android.os.Build;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingClient;
 import com.google.android.gms.location.GeofencingEvent;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
@@ -40,6 +46,7 @@ import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_ENTER
 import static com.google.android.gms.location.Geofence.GEOFENCE_TRANSITION_EXIT;
 import static com.google.android.gms.location.Geofence.NEVER_EXPIRE;
 
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -72,6 +79,13 @@ public class MainActivity extends AppCompatActivity {
 
     // User information
     private int mUserId;
+
+    private TextView mTextView;
+
+    Location curLoc;
+    private FusedLocationProviderClient fusedLocationClient;
+    private LocationCallback locationCallback;
+
 
     // GUI variables
     LayoutInflater mInflater;
@@ -128,6 +142,8 @@ public class MainActivity extends AppCompatActivity {
         // Initialize user ID
         mUserId = 0;
 
+        mTextView = findViewById(R.id.text_lat_lon);
+
         // Find views
         linearWhiteboards = findViewById(R.id.linear_whiteboards);
         mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -158,9 +174,38 @@ public class MainActivity extends AppCompatActivity {
         mWhiteboardFencesMap = new HashMap<>();
         geofencingClient = LocationServices.getGeofencingClient(this);
 
-        //create Api Client
-        googleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
+        // Create callback function for realtime location results
+        locationCallback = new LocationCallback() {
+            @Override
+            public void onLocationResult(LocationResult locationResult) {
+                if (locationResult == null) {
+                    return;
+                }
+                for (Location loc : locationResult.getLocations()) {
+                    updateCurLoc(loc);
+                }
+            }
+        };
+
+
+        // Start the service by getting the current location once
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location loc) {
+                        updateCurLoc(loc);
+                    }
+                });
+​
+        // Begin realtime update listening
+        startLocationUpdates();
+    }
+
+
+    //create Api Client
+    googleApiClient = new GoogleApiClient.Builder(this)
+            .addApi(LocationServices.API).addConnectionCallbacks(new GoogleApiClient.ConnectionCallbacks() {
                     @Override
                     public void onConnected(@Nullable Bundle bundle) {
                        Log.d(TAG, "Connected to GoogleApiClient");
@@ -191,6 +236,7 @@ public class MainActivity extends AppCompatActivity {
             locationManager.requestLocationUpdates(
                     LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
         }
+        };
 
 
 //        //create geofence
@@ -227,7 +273,7 @@ public class MainActivity extends AppCompatActivity {
 //            // Background location runtime permission already granted.
 //            // You can now call geofencingClient.addGeofences().
 //        }
-    }
+
 
     @Override
     protected void onDestroy() {
@@ -254,6 +300,8 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "OnReume called");
         super.onResume();
 
+        startLocationUpdates();
+
         int response = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
         if (response != ConnectionResult.SUCCESS){
             Log.d(TAG, "Google play Services Not Available - Show Dialog to ask User to Download it");
@@ -262,6 +310,12 @@ public class MainActivity extends AppCompatActivity {
         else {
             Log.d(TAG, "Google play Services is Available - no action is required");
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -278,6 +332,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "onstop called");
         super.onStop();
         googleApiClient.disconnect();
+        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 /*
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -300,6 +355,39 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 */
+
+
+    public void updateCurLoc(Location loc) {
+        Log.d(TAG, "Updating");
+​
+        // Store the new location and display it on screen
+        curLoc = loc;
+        if (curLoc == null) {
+            mTextView.setText("NULL location.");
+        } else {
+            String message =
+                    "Latitude: " + curLoc.getLatitude() + "\n" +
+                            "Longitude: " + curLoc.getLongitude();
+            mTextView.setText(message);
+        }
+    }
+
+
+    public void startLocationUpdates() {
+        // Request for location
+        LocationRequest locationRequest = new LocationRequest()
+                .setInterval(100)
+                .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+​
+        // Begin the listener
+        fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+        );
+    }
+
+
 
 
     private void startGeoFenceMonitoring(){ //setup checking if your in a fence location
