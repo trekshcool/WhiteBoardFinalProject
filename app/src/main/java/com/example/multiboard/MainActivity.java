@@ -1,20 +1,12 @@
 package com.example.multiboard;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.location.Location;
-import android.location.LocationListener;
-import android.location.LocationManager;
 import android.os.Build;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -26,10 +18,7 @@ import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
@@ -46,7 +35,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * This Activity is the default starting place for the app and allows the user to sign in.
@@ -162,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 for (Location loc : locationResult.getLocations()) {
                     updateCurLoc(loc);
+                    updateWhiteboardAvailability();
                 }
             }
         };
@@ -173,14 +162,17 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onSuccess(Location loc) {
                         updateCurLoc(loc);
+                        updateWhiteboardAvailability();
                     }
                 });
 
         //Begin realtime update listening
         startLocationUpdates();
 
-        requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
+        }
     }
 
     @Override
@@ -240,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
     public void startLocationUpdates() {
         // Request for location
         LocationRequest locationRequest = new LocationRequest()
-                .setInterval(100)
+                .setInterval(500)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         // Begin the listener
@@ -251,21 +243,19 @@ public class MainActivity extends AppCompatActivity {
         );
     }
 
-    //Debuger to find if near a white boead
-    private void nearWhiteboard(){
-        Log.d(TAG, "update location");
+    /**
+     * Updates all Whiteboard availability using the distance function and curLoc.
+     */
+    private void updateWhiteboardAvailability(){
+        Log.d(TAG, "Updating Whiteboards");
 
-        //loop through Whiteboards in __
+        // Loop through Whiteboards in whiteboardList
         for (Whiteboard whiteboard: whiteboardList){
-
-            Log.d(TAG, "get whitbord: " + whiteboard.getName());
-            //if distance is less then or equal
-            if (findDistace(
-                    curLoc.getLatitude(),curLoc.getLongitude(),
-                    whiteboard.getLatitude(), whiteboard.getLongitude())
-                    <= whiteboard.getRadius()){
-                Log.d(TAG, "within Area: " + whiteboard.getName());
-
+            Log.d(TAG, "Update Whiteboard: " + whiteboard.getName());
+            // If distance is less than or equal
+            if (findDistance(curLoc.getLatitude(), curLoc.getLongitude(), whiteboard)
+                    <= whiteboard.getRadius()) {
+                Log.d(TAG, "Within radius: " + whiteboard.getName());
                 whiteboard.activate();
             }
             else {
@@ -274,15 +264,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //calc distence form whiteBoard distacne. use pythagorean theorem and convert double to Float.
-    private float findDistace(double yourLatatude, double YourLaungatude, double whiteBoardLatatude, double whiteBoardLaungatude){
-        //a = |a1 - a2|
-        double latatude = Math.abs(yourLatatude - whiteBoardLatatude);
-        //b = |b1 - b2|
-        double laungatude = Math.abs(YourLaungatude - whiteBoardLaungatude);
+    /**
+     * Calculate distance from whiteboard. (Use Haversine formula for spherical distance).
+     * @param latitude latitude to check.
+     * @param longitude longitude to check.
+     * @param whiteboard whiteboard to check coordinates of.
+     * @return distance from given coordinates to the whiteboard.
+     */
+    private static double findDistance(double latitude, double longitude, Whiteboard whiteboard){
+        // Radius of earth in KM
+        double R = 6378.137;
 
-        //c = (a^2 + b^2)^1/2
-        return (float) Math.sqrt(Math.pow(latatude,2) + Math.pow(laungatude,2));
+        // Convert to radians
+        double userLat = latitude * Math.PI / 180;
+        double userLon = longitude * Math.PI / 180;
+        double wbLat = whiteboard.getLatitude() * Math.PI / 180;
+        double wbLon = whiteboard.getLongitude() * Math.PI / 180;
+
+        // Get deltas
+        double dLat = userLat - wbLat;
+        double dLon = userLon - wbLon;
+
+        // Formula
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(userLat) * Math.cos(wbLat) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double d = R * c;
+
+        return d * 1000; // In meters
     }
 
 }

@@ -18,9 +18,9 @@ public class Whiteboard {
 
     private String mName; // Unique name representing this Whiteboard
     private Pixel[][] mBoard; // The board data itself
-    private float mLatitude; // Coordinates for the centroid
-    private float mLongitude;
-    private float mRadius; // Radius of geofence circle
+    private double mLatitude; // Coordinates for the centroid
+    private double mLongitude;
+    private double mRadius; // Radius of geofence circle
     private int mInkLevel;
     private View mCardView; // CardView in list of Whiteboards
 
@@ -98,27 +98,27 @@ public class Whiteboard {
         mName = name;
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return mLatitude;
     }
 
-    public void setLatitude(float mLatitude) {
+    public void setLatitude(double mLatitude) {
         this.mLatitude = mLatitude;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return mLongitude;
     }
 
-    public void setLongitude(float mLongitude) {
+    public void setLongitude(double mLongitude) {
         this.mLongitude = mLongitude;
     }
 
-    public float getRadius() {
+    public double getRadius() {
         return mRadius;
     }
 
-    public void setRadius(float mRadius) {
+    public void setRadius(double mRadius) {
         this.mRadius = mRadius;
     }
 
