@@ -2,24 +2,29 @@ package com.example.multiboard;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.location.Location;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
+import java.util.Comparator;
 import java.util.Locale;
 
 /**
  * Represents an individual Whiteboard, storing pixels for painting and rendering and GPS
  * information for checking user coordinates.
  */
-public class Whiteboard {
+public class Whiteboard implements Comparable<Whiteboard> {
 
+    // Constants
     private final static int WIDTH = 5000;
     private final static int HEIGHT = 5000;
     public final static int MAX_INK = 150;
 
+    // Whiteboard variables
     private String mName; // Unique name representing this Whiteboard
     private Pixel[][] mBoard; // The board data itself
     private double mLatitude; // Coordinates for the centroid
@@ -27,6 +32,9 @@ public class Whiteboard {
     private double mRadius; // Radius of geofence circle
     private int mInkLevel;
     private boolean active = false; // Whether the Whiteboard is in range or not
+    private double distFromUser = Double.MAX_VALUE;
+
+    // GUI Views
     private CardView mCardView; // CardView in list of Whiteboards
     private TextView distText;
 
@@ -97,14 +105,15 @@ public class Whiteboard {
      * @param longitude the user's longitude.
      */
     public void updateDistance(double latitude, double longitude) {
-        double distance = findDistance(latitude, longitude);
+        distFromUser = findDistance(latitude, longitude);
 
         // Check for activation within radius
-        if (distance <= getRadius()) {
+        if (distFromUser <= getRadius()) {
             distText.setText(R.string.dist_text_available);
             activate();
         } else {
-            distText.setText(String.format(Locale.ENGLISH, "Distance: %.0f meters", distance));
+            String text = String.format(Locale.ENGLISH, "Distance: %.0f meters", distFromUser);
+            distText.setText(text);
             deactivate();
         }
     }
@@ -112,7 +121,7 @@ public class Whiteboard {
     /**
      * Makes the Whiteboard active and its CardView brightly colored.
      */
-    public void activate() {
+    private void activate() {
         Context context = mCardView.getContext();
         int colorId = R.color.color_card_active;
         mCardView.setCardBackgroundColor(context.getResources().getColor(colorId));
@@ -124,7 +133,7 @@ public class Whiteboard {
     /**
      * Makes the Whiteboard inactive and its CardView grayed out.
      */
-    public void deactivate() {
+    private void deactivate() {
         Context context = mCardView.getContext();
         int colorId = R.color.color_card_inactive;
         mCardView.setCardBackgroundColor(context.getResources().getColor(colorId));
@@ -213,5 +222,21 @@ public class Whiteboard {
         double d = R * c;
 
         return d * 1000; // In meters
+    }
+
+    /**
+     * Compares to sort by distance from user. If distances are within a meter, sort by name.
+     * @param other whiteboard to compare with.
+     * @return positive int if this Whiteboard is greater in value, negative if less, 0 if same.
+     */
+    @Override
+    public int compareTo(@NonNull Whiteboard other) {
+        int deltaDist = (int)(this.distFromUser - other.distFromUser);
+        if (deltaDist == 0) {
+            // Compare names for alphabetical order if distances are within a meter
+            return this.getName().compareTo(other.getName());
+        } else {
+            return deltaDist;
+        }
     }
 }

@@ -36,6 +36,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 /**
  * This Activity shows all the Whiteboards in the database and displays them for the user to find.
@@ -193,6 +195,10 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
+    /**
+     * Opens the PaintingActivity if possible.
+     * @param v CardView that was clicked on.
+     */
     public void cardClick(View v) {
         // Iterate over whiteboards in list until we find the one that was clicked
         for (Whiteboard wb : whiteboardList) {
@@ -272,6 +278,13 @@ public class MainActivity extends AppCompatActivity {
             Log.d(TAG, "Update Whiteboard: " + whiteboard.getName());
             whiteboard.updateDistance(curLoc.getLatitude(), curLoc.getLongitude());
         }
+
+        // Re-order linearWhiteboards layout
+        Collections.sort(whiteboardList, new WhiteboardSorter());
+        linearWhiteboards.removeAllViews();
+        for (Whiteboard wb : whiteboardList) {
+            linearWhiteboards.addView(wb.getCardView());
+        }
     }
 
     //create a intent to point page
@@ -304,6 +317,20 @@ public class MainActivity extends AppCompatActivity {
             default:  Log.v(TAG, "request code wrong");
                 break;
         }
+    }
+
+
+    class WhiteboardSorter implements Comparator<Whiteboard> {
+
+        /**
+         * Used for sorting a Collection of Whiteboards.
+         * @param wb1 first Whiteboard object.
+         * @param wb2 second Whiteboard object.
+         */
+        public int compare(Whiteboard wb1, Whiteboard wb2) {
+            return wb1.compareTo(wb2);
+        }
+
     }
 
 }
