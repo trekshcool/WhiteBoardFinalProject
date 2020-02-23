@@ -16,7 +16,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -37,13 +36,11 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 /**
- * This Activity is the default starting place for the app and allows the user to sign in.
+ * This Activity shows all the Whiteboards in the database and displays them for the user to find.
  */
 public class MainActivity extends AppCompatActivity {
 
-    public static final  String GEOFENCE_ID = "MyGeofenceId";
-    private GeoLocations geoLocations = new GeoLocations(); // hold locations for Fence to use
-
+    // Debugging
     private static final String TAG = "MainActivity";
 
     // Shared Preferences variables
@@ -58,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
     // User information
     private int mUserId;
 
+    // Location variables
     Location curLoc;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
@@ -66,12 +64,17 @@ public class MainActivity extends AppCompatActivity {
     LayoutInflater mInflater;
     LinearLayout linearWhiteboards;
 
-
-    // arraylist of all  Whiteboards
+    // Arraylist of all Whiteboards
     private ArrayList<Whiteboard> whiteboardList;
 
     // Callbacks for Firebase updates
     ValueEventListener whiteboardListener = new ValueEventListener() {
+        /**
+         * This method is called when the Activity is started and whenever something in the
+         * 'whiteboards' node of the database is modified. This allows the activity to display all
+         * the Whiteboards on the database.
+         * @param dataSnapshot new data.
+         */
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
             // Iterate over all modified whiteboards
@@ -100,7 +103,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
+    //@RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -133,16 +136,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Other Firebase
+        // Firebase data
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseDatabaseReference.child("whiteboards").addValueEventListener(whiteboardListener);
 
         // Whiteboards
         whiteboardList = new ArrayList<>();
 
-
         // Create callback function for realtime location results
         locationCallback = new LocationCallback() {
+            /**
+             * This method is called regularly as the user's GPS location changes.
+             * @param locationResult the new location of the user.
+             */
             @Override
             public void onLocationResult(LocationResult locationResult) {
                 if (locationResult == null) {
@@ -155,9 +161,15 @@ public class MainActivity extends AppCompatActivity {
             }
         };
 
+        // Request permissions for location tracking
+        if (android.os.Build.VERSION.SDK_INT >= 23) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
+        }
+
         // Start the service by getting the current location once
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        Task<Location> locationTask = fusedLocationClient.getLastLocation()
+        fusedLocationClient.getLastLocation()
                 .addOnSuccessListener(this, new OnSuccessListener<Location>() {
                     @Override
                     public void onSuccess(Location loc) {
@@ -168,11 +180,6 @@ public class MainActivity extends AppCompatActivity {
 
         //Begin realtime update listening
         startLocationUpdates();
-
-        if (android.os.Build.VERSION.SDK_INT >= 23) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
-        }
     }
 
     @Override
@@ -183,13 +190,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void cardClick(View v) {
         // TODO: Get Whiteboard and start whiteboard activity
-    }
-
-    /**
-     * Updates the distance reading for Whiteboard list cards.
-     */
-    private void updateDistances() {
-        // TODO: Update Whiteboard distances
     }
 
     @Override
@@ -219,6 +219,10 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
+    /**
+     * Updates the current location of the user. If the location result is null, curLoc unchanged.
+     * @param loc the new location to update to.
+     */
     public void updateCurLoc(Location loc) {
         Log.d(TAG, "Updating");
 
@@ -229,6 +233,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Tells the fusedLocationClient to begin listening for updates.
+     */
     public void startLocationUpdates() {
         // Request for location
         LocationRequest locationRequest = new LocationRequest()

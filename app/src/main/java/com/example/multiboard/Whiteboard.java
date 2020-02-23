@@ -62,6 +62,9 @@ public class Whiteboard {
         }
     }
 
+    /**
+     * Load in and start listening for Pixel data from the database's board-data node.
+     */
     private void loadBoard() {
         // TODO: Get pixel data from database and write to board
     }
@@ -84,6 +87,12 @@ public class Whiteboard {
         distText.setText(R.string.default_dist_text);
     }
 
+    /**
+     * Updates the current distance display for the Whiteboard and activates/deactivates the
+     * CardView as necessary.
+     * @param latitude the user's latitude.
+     * @param longitude the user's longitude.
+     */
     public void updateDistance(double latitude, double longitude) {
         double distance = findDistance(latitude, longitude);
 
@@ -97,10 +106,16 @@ public class Whiteboard {
         }
     }
 
+    /**
+     * Makes the Whiteboard's CardView clickable and brightly colored.
+     */
     public void activate() {
         // TODO: Make clickable and bright
     }
 
+    /**
+     * Makes the Whiteboard's CardView unclickable and grayed out.
+     */
     public void deactivate() {
         // TODO: Make un-clickable and grayed
     }
