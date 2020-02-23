@@ -14,8 +14,21 @@ public class Pixel {
     private String user;
     private int color;
 
+    /**
+     * Default constructor uses null for user and default white color.
+     */
     public Pixel() {
-        color = DEFAULT_COLOR;
+        this(null, DEFAULT_COLOR);
+    }
+
+    /**
+     * Construct a Pixel object with the given user and color.
+     * @param user user who last modified this Pixel.
+     * @param color current color of this Pixel.
+     */
+    public Pixel(String user, int color) {
+        this.user = user;
+        this.color = color;
     }
 
     public String getUser() {
