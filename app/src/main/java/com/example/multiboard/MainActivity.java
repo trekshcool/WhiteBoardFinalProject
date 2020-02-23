@@ -69,8 +69,6 @@ public class MainActivity extends AppCompatActivity {
     // User information
     private int mUserId;
 
-    private TextView mTextView;
-
     Location curLoc;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationCallback locationCallback;
@@ -108,7 +106,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        @RequiresApi(api = Build.VERSION_CODES.M)
         @Override
         public void onCancelled(@NonNull DatabaseError databaseError) {
             // Getting data failed
@@ -116,7 +113,6 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -127,8 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         // Initialize user ID
         mUserId = 0;
-
-        mTextView = findViewById(R.id.text_lat_lon);
 
         // Find views
         linearWhiteboards = findViewById(R.id.linear_whiteboards);
@@ -182,11 +176,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 });
 
-        //Begin Realtime update Listenering
+        //Begin realtime update listening
         startLocationUpdates();
-
-        requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
+//
+//        requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
+//                Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
     }
 
     @Override
@@ -208,22 +202,11 @@ public class MainActivity extends AppCompatActivity {
         // TODO: Update Whiteboard distances
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onResume() {
         Log.d(TAG, "OnReume called");
         super.onResume();
-
         startLocationUpdates();
-
-        int response = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this);
-        if (response != ConnectionResult.SUCCESS){
-            Log.d(TAG, "Google play Services Not Available - Show Dialog to ask User to Download it");
-            GoogleApiAvailability.getInstance().getErrorDialog(this, response, 1).show();
-        }
-        else {
-            Log.d(TAG, "Google play Services is Available - no action is required");
-        }
     }
 
     @Override
@@ -232,14 +215,13 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onStart(){
         Log.d(TAG, "onStart called");
         super.onStart();
+        startLocationUpdates();
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onStop(){
         Log.d(TAG, "onstop called");
@@ -250,15 +232,10 @@ public class MainActivity extends AppCompatActivity {
     public void updateCurLoc(Location loc) {
         Log.d(TAG, "Updating");
 
-        //Store the new Location and Display it on screen
-        curLoc = loc;
-        if (curLoc == null) {
-            mTextView.setText("NULL location.");
-        } else {
-            String message =
-                    "Latitude: " + curLoc.getLatitude() + "\n" +
-                            "Longitude: " + curLoc.getLongitude();
-            mTextView.setText(message);
+        //Store the new Location
+        if (curLoc != null) {
+            Log.d(TAG, "LAT: " + loc.getLatitude() + ", LON: " + loc.getLongitude());
+            curLoc = loc;
         }
     }
 
@@ -305,23 +282,6 @@ public class MainActivity extends AppCompatActivity {
         return (float) Math.sqrt(Math.pow(latatude,2) + Math.pow(laungatude,2));
     }
 
-    /*---------- Listener class to get coordinates ------------- */
-    private class MyLocationListener implements LocationListener {
-
-        @Override
-        public void onLocationChanged(Location loc) {
-            Log.d(TAG, "LAT: " + loc.getLatitude() + "LON: " + loc.getLongitude());
-        }
-
-        @Override
-        public void onProviderDisabled(String provider) {}
-
-        @Override
-        public void onProviderEnabled(String provider) {}
-
-        @Override
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
-    }
 }
 
 
