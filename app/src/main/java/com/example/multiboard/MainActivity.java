@@ -45,6 +45,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -77,11 +78,9 @@ public class MainActivity extends AppCompatActivity {
     LayoutInflater mInflater;
     LinearLayout linearWhiteboards;
 
-    // Map of all present Whiteboards to their card views
-    private HashMap<Whiteboard, View> mListCardMap;
 
-    // Map of all geofences to their respective Whiteboards
-    private HashMap<Geofence, Whiteboard> mWhiteboardFencesMap;
+    // arraylist of all  Whiteboards
+    private ArrayList<Whiteboard> whiteboardList;
 
     // Callbacks for Firebase updates
     ValueEventListener whiteboardListener = new ValueEventListener() {
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 // Add list card
                 View cardView = mInflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards, false);
                 linearWhiteboards.addView(cardView);
-                mListCardMap.put(wb, cardView);
+                whiteboardList.add(wb);
 
                 // Fill in information on the new list card
                 try {
@@ -113,6 +112,7 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -150,8 +150,8 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseDatabaseReference.child("whiteboards").addValueEventListener(whiteboardListener);
 
         // Whiteboards
-        mListCardMap = new HashMap<>();
-        mWhiteboardFencesMap = new HashMap<>();
+        whiteboardList = new ArrayList<>();
+
 
         // Create callback function for realtime location results
         locationCallback = new LocationCallback() {
@@ -186,9 +186,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        for (Geofence geofence : mWhiteboardFencesMap.keySet()) {
-            //stopGeoFenceMonitoring(geofence.getRequestId());
-        }
+        fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
     public void cardClick(View v) {
@@ -258,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "update location");
 
         //loop through Whiteboards in __
-        for (Whiteboard whiteboard: mListCardMap.keySet()){
+        for (Whiteboard whiteboard: whiteboardList){
 
             Log.d(TAG, "get whitbord: " + whiteboard.getName());
             //if distance is less then or equal
@@ -267,6 +265,11 @@ public class MainActivity extends AppCompatActivity {
                     whiteboard.getLatitude(), whiteboard.getLongitude())
                     <= whiteboard.getRadius()){
                 Log.d(TAG, "within Area: " + whiteboard.getName());
+
+                whiteboard.activate();
+            }
+            else {
+                whiteboard.deactivate();
             }
         }
     }
