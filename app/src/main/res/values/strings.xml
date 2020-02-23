@@ -6,4 +6,5 @@
     <string name="text_card_ink_level">Ink level:</string>
     <string name="default_dist_text">Distance: Unavailable</string>
     <string name="dist_text_available">Available!</string>
+    <string name="text_board_name_default">Whiteboard</string>
 </resources>

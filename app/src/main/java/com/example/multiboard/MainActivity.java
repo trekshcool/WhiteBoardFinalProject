@@ -5,8 +5,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
+import android.nfc.Tag;
 import android.os.Build;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -39,6 +41,9 @@ import java.util.ArrayList;
  * This Activity shows all the Whiteboards in the database and displays them for the user to find.
  */
 public class MainActivity extends AppCompatActivity {
+
+    //the REQUEST number for returning intents
+    public static final int REQUEST_CODE_HEAR = 4303;
 
     // Debugging
     private static final String TAG = "MainActivity";
@@ -189,12 +194,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void cardClick(View v) {
-        // TODO: Get Whiteboard and start whiteboard activity
+        // Iterate over whiteboards in list until we find the one that was clicked
+        for (Whiteboard wb : whiteboardList) {
+            // Only open if active, ignore otherwise
+            if (wb.getCardView() == v && wb.isActive()) {
+                openPaintingActivity(wb);
+            }
+        }
     }
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "OnReume called");
+        Log.d(TAG, "onResume called");
         super.onResume();
         startLocationUpdates();
     }
@@ -214,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop(){
-        Log.d(TAG, "onstop called");
+        Log.d(TAG, "onStop called");
         super.onStop();
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
@@ -260,6 +271,38 @@ public class MainActivity extends AppCompatActivity {
         for (Whiteboard whiteboard: whiteboardList){
             Log.d(TAG, "Update Whiteboard: " + whiteboard.getName());
             whiteboard.updateDistance(curLoc.getLatitude(), curLoc.getLongitude());
+        }
+    }
+
+    //create a intent to point page
+    public void openPaintingActivity(Whiteboard whiteboard){
+        Log.v(TAG, "open Login intent");
+
+        Intent intent = PaintingActivity.makeIntent(MainActivity.this, whiteboard.getName());
+
+        Log.v(TAG, "hear from login");
+        startActivityForResult(intent, REQUEST_CODE_HEAR);
+    }
+
+    //Return infomation on return
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(TAG, "get from PaintingActivity");
+
+        switch (requestCode){
+            case REQUEST_CODE_HEAR: {
+                Log.v(TAG, "request code corect");
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.v(TAG, "Activity ok");
+                    //Log.v(TAG, data.getStringExtra("count"));
+                } else { // if fails
+                    Log.v(TAG, "Activity canciled");
+                }
+                break;
+            }
+            //if request is wrong
+            default:  Log.v(TAG, "request code wrong");
+                break;
         }
     }
 

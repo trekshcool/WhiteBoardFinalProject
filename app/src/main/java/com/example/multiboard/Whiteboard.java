@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
+
 import java.util.Locale;
 
 /**
@@ -24,7 +26,8 @@ public class Whiteboard {
     private double mLongitude;
     private double mRadius; // Radius of geofence circle
     private int mInkLevel;
-    private View mCardView; // CardView in list of Whiteboards
+    private boolean active = false; // Whether the Whiteboard is in range or not
+    private CardView mCardView; // CardView in list of Whiteboards
     private TextView distText;
 
     /**
@@ -76,7 +79,7 @@ public class Whiteboard {
      */
     public void setupListCard(Context context, View view) {
         // Set Whiteboard text views
-        mCardView = view;
+        mCardView = (CardView) view;
         ((TextView) view.findViewById(R.id.text_name)).setText(getName());
 
         int inkLevel = getInkLevel() * 100 / Whiteboard.MAX_INK;
@@ -107,17 +110,27 @@ public class Whiteboard {
     }
 
     /**
-     * Makes the Whiteboard's CardView clickable and brightly colored.
+     * Makes the Whiteboard active and its CardView brightly colored.
      */
     public void activate() {
-        // TODO: Make clickable and bright
+        Context context = mCardView.getContext();
+        int colorId = R.color.color_card_active;
+        mCardView.setCardBackgroundColor(context.getResources().getColor(colorId));
+
+        // This makes the CardView respond to clicks
+        active = true;
     }
 
     /**
-     * Makes the Whiteboard's CardView unclickable and grayed out.
+     * Makes the Whiteboard inactive and its CardView grayed out.
      */
     public void deactivate() {
-        // TODO: Make un-clickable and grayed
+        Context context = mCardView.getContext();
+        int colorId = R.color.color_card_inactive;
+        mCardView.setCardBackgroundColor(context.getResources().getColor(colorId));
+
+        // This makes the CardView ignore clicks
+        active = false;
     }
 
     public String getName() {
@@ -158,6 +171,14 @@ public class Whiteboard {
 
     void setInkLevel(int inkLevel) {
         mInkLevel = inkLevel;
+    }
+
+    boolean isActive() {
+        return active;
+    }
+
+    CardView getCardView() {
+        return mCardView;
     }
 
     @Override
