@@ -232,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
     public void startLocationUpdates() {
         // Request for location
         LocationRequest locationRequest = new LocationRequest()
-                .setInterval(500)
+                .setInterval(100)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         // Begin the listener
