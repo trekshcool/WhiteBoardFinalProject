@@ -1,5 +1,6 @@
 package com.example.multiboard;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,10 +18,11 @@ public class Whiteboard {
 
     private String mName; // Unique name representing this Whiteboard
     private Pixel[][] mBoard; // The board data itself
-    private float mLatitude; // Coordinates for the centroid
-    private float mLongitude;
-    private float mRadius; // Radius of geofence circle
+    private double mLatitude; // Coordinates for the centroid
+    private double mLongitude;
+    private double mRadius; // Radius of geofence circle
     private int mInkLevel;
+    private View mCardView; // CardView in list of Whiteboards
 
     // TODO Whiteboard GPS location and GeoFence structure, getters and setters
 
@@ -70,10 +72,22 @@ public class Whiteboard {
      */
     public void setupListCard(Context context, View view) {
         // Set Whiteboard text views
+        mCardView = view;
         ((TextView) view.findViewById(R.id.text_name)).setText(getName());
         int inkLevel = getInkLevel() * 100 / Whiteboard.MAX_INK;
         String inkMessage = context.getString(R.string.text_card_ink_level) + " " + inkLevel + "%";
         ((TextView) view.findViewById(R.id.text_ink_level)).setText(inkMessage);
+    }
+
+
+    public void activate() {
+        // TODO: Make clickable and bright
+        ((TextView) mCardView.findViewById(R.id.text_ink_level)).setText("Available");
+    }
+
+    public void deactivate() {
+        // TODO: Make un-clickable and grayed
+        ((TextView) mCardView.findViewById(R.id.text_ink_level)).setText("Unavailable");
     }
 
     public String getName() {
@@ -84,27 +98,27 @@ public class Whiteboard {
         mName = name;
     }
 
-    public float getLatitude() {
+    public double getLatitude() {
         return mLatitude;
     }
 
-    public void setLatitude(float mLatitude) {
+    public void setLatitude(double mLatitude) {
         this.mLatitude = mLatitude;
     }
 
-    public float getLongitude() {
+    public double getLongitude() {
         return mLongitude;
     }
 
-    public void setLongitude(float mLongitude) {
+    public void setLongitude(double mLongitude) {
         this.mLongitude = mLongitude;
     }
 
-    public float getRadius() {
+    public double getRadius() {
         return mRadius;
     }
 
-    public void setRadius(float mRadius) {
+    public void setRadius(double mRadius) {
         this.mRadius = mRadius;
     }
 
