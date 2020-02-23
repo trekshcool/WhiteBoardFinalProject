@@ -185,18 +185,6 @@ public class MainActivity extends AppCompatActivity {
         //Begin Realtime update Listenering
         startLocationUpdates();
 
-        // Create callback function for realtime location results
-        locationCallback = new LocationCallback() {
-            @Override
-            public void onLocationResult(LocationResult locationResult) {
-                if (locationResult == null) {
-                    return;
-                }
-                for (Location loc : locationResult.getLocations()) {
-                    updateCurLoc(loc);
-                }
-            }
-        };
         requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
     }
@@ -259,7 +247,6 @@ public class MainActivity extends AppCompatActivity {
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
 
-    @SuppressLint("SetTextI18n")
     public void updateCurLoc(Location loc) {
         Log.d(TAG, "Updating");
 
@@ -293,22 +280,28 @@ public class MainActivity extends AppCompatActivity {
     private void nearWhiteboard(){
         Log.d(TAG, "update location");
 
+        //loop through Whiteboards in __
         for (Whiteboard whiteboard: mListCardMap.keySet()){
 
+            Log.d(TAG, "get whitbord: " + whiteboard.getName());
+            //if distance is less then or equal
             if (findDistace(
                     curLoc.getLatitude(),curLoc.getLongitude(),
                     whiteboard.getLatitude(), whiteboard.getLongitude())
                     <= whiteboard.getRadius()){
-                Log.d(TAG, "within Area" + whiteboard.getName());
+                Log.d(TAG, "within Area: " + whiteboard.getName());
             }
         }
     }
 
     //calc distence form whiteBoard distacne. use pythagorean theorem and convert double to Float.
     private float findDistace(double yourLatatude, double YourLaungatude, double whiteBoardLatatude, double whiteBoardLaungatude){
+        //a = |a1 - a2|
         double latatude = Math.abs(yourLatatude - whiteBoardLatatude);
+        //b = |b1 - b2|
         double laungatude = Math.abs(YourLaungatude - whiteBoardLaungatude);
 
+        //c = (a^2 + b^2)^1/2
         return (float) Math.sqrt(Math.pow(latatude,2) + Math.pow(laungatude,2));
     }
 
