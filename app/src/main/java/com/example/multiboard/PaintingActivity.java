@@ -13,65 +13,47 @@ import android.widget.TextView;
 
 public class PaintingActivity extends AppCompatActivity {
 
+    // Debugging
     private static final String TAG = "PaintingActivity";
+
+    // Whiteboard variables
     private Whiteboard whiteboard;
     private String whiteboardName;
 
     // GUI Views
     private TextView textBoardName;
-    private Button closeButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_painting);
 
-        Log.v(TAG, "log load");
-
         // Find views
         textBoardName = findViewById(R.id.text_board_name);
 
+        // Setup Whiteboard using the extras that were passed in
         extractDataFromIntent();
-        setupEndActivityButton();
     }
 
-    // Extract data from Main's intent
+    /**
+     * Extract data from MainActivity's intent.
+     */
     private void extractDataFromIntent() {
         Intent intent = getIntent();
-        Log.v(TAG, "get intent from Main");
-
         whiteboardName = intent.getStringExtra("whiteboardName");
-        Log.v(TAG, "whiteboardName: " + whiteboardName);
-        Log.v("Lab1", "finish extract");
-
         textBoardName.setText(whiteboardName);
     }
 
-    //close Painting Activity
-    private void setupEndActivityButton() {
-        // Setup and listen to
-        closeButton = findViewById(R.id.btn_change_to_main);
-        closeButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                Intent intent = new Intent();
-
-                // Pass entry and close Paint
-                setResult(Activity.RESULT_OK, intent);
-                finish();
-            }
-        });
-    }
-
-    public static Intent makeIntent(Context context, String whiteboardName){
-        Log.v(TAG, "make new intent");
-
+    /**
+     * Create an Intent to launch the PaintingActivity with the given Whiteboard name.
+     * @param context current context to launch the Activity with.
+     * @param whiteboardName the name of the Whiteboard to paint on.
+     * @return the new Intent ready to be started.
+     */
+    public static Intent makeIntent(Context context, String whiteboardName) {
+        // Create the intent with an extra for the Whiteboard name
         Intent intent = new Intent(context, PaintingActivity.class);
-
         intent.putExtra("whiteboardName", whiteboardName);
-        Log.v(TAG, "name: " + whiteboardName);
-
         return intent;
     }
 }
