@@ -4,4 +4,6 @@
     <string name="text_card_name">Whiteboard Name</string>
     <string name="text_card_dist">Distance:</string>
     <string name="text_card_ink_level">Ink level:</string>
+    <string name="default_dist_text">Distance: Unavailable</string>
+    <string name="dist_text_available">Available!</string>
 </resources>

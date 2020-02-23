@@ -252,46 +252,8 @@ public class MainActivity extends AppCompatActivity {
         // Loop through Whiteboards in whiteboardList
         for (Whiteboard whiteboard: whiteboardList){
             Log.d(TAG, "Update Whiteboard: " + whiteboard.getName());
-            // If distance is less than or equal
-            if (findDistance(curLoc.getLatitude(), curLoc.getLongitude(), whiteboard)
-                    <= whiteboard.getRadius()) {
-                Log.d(TAG, "Within radius: " + whiteboard.getName());
-                whiteboard.activate();
-            }
-            else {
-                whiteboard.deactivate();
-            }
+            whiteboard.updateDistance(curLoc.getLatitude(), curLoc.getLongitude());
         }
-    }
-
-    /**
-     * Calculate distance from whiteboard. (Use Haversine formula for spherical distance).
-     * @param latitude latitude to check.
-     * @param longitude longitude to check.
-     * @param whiteboard whiteboard to check coordinates of.
-     * @return distance from given coordinates to the whiteboard.
-     */
-    private static double findDistance(double latitude, double longitude, Whiteboard whiteboard){
-        // Radius of earth in KM
-        double R = 6378.137;
-
-        // Convert to radians
-        double userLat = latitude * Math.PI / 180;
-        double userLon = longitude * Math.PI / 180;
-        double wbLat = whiteboard.getLatitude() * Math.PI / 180;
-        double wbLon = whiteboard.getLongitude() * Math.PI / 180;
-
-        // Get deltas
-        double dLat = userLat - wbLat;
-        double dLon = userLon - wbLon;
-
-        // Formula
-        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-                Math.cos(userLat) * Math.cos(wbLat) * Math.sin(dLon/2) * Math.sin(dLon/2);
-        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-        double d = R * c;
-
-        return d * 1000; // In meters
     }
 
 }

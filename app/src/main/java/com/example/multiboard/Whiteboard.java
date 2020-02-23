@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Locale;
+
 /**
  * Represents an individual Whiteboard, storing pixels for painting and rendering and GPS
  * information for checking user coordinates.
@@ -23,8 +25,7 @@ public class Whiteboard {
     private double mRadius; // Radius of geofence circle
     private int mInkLevel;
     private View mCardView; // CardView in list of Whiteboards
-
-    // TODO Whiteboard GPS location and GeoFence structure, getters and setters
+    private TextView distText;
 
     /**
      * Construct an empty Whiteboard.
@@ -74,20 +75,34 @@ public class Whiteboard {
         // Set Whiteboard text views
         mCardView = view;
         ((TextView) view.findViewById(R.id.text_name)).setText(getName());
+
         int inkLevel = getInkLevel() * 100 / Whiteboard.MAX_INK;
         String inkMessage = context.getString(R.string.text_card_ink_level) + " " + inkLevel + "%";
         ((TextView) view.findViewById(R.id.text_ink_level)).setText(inkMessage);
+
+        distText = view.findViewById(R.id.text_dist);
+        distText.setText(R.string.default_dist_text);
     }
 
+    public void updateDistance(double latitude, double longitude) {
+        double distance = findDistance(latitude, longitude);
+
+        // Check for activation within radius
+        if (distance <= getRadius()) {
+            distText.setText(R.string.dist_text_available);
+            activate();
+        } else {
+            distText.setText(String.format(Locale.ENGLISH, "Distance: %.0f meters", distance));
+            deactivate();
+        }
+    }
 
     public void activate() {
         // TODO: Make clickable and bright
-        ((TextView) mCardView.findViewById(R.id.text_ink_level)).setText("Available");
     }
 
     public void deactivate() {
         // TODO: Make un-clickable and grayed
-        ((TextView) mCardView.findViewById(R.id.text_ink_level)).setText("Unavailable");
     }
 
     public String getName() {
@@ -133,5 +148,34 @@ public class Whiteboard {
     @Override
     public int hashCode() {
         return mName.hashCode();
+    }
+
+    /**
+     * Calculate distance from whiteboard. (Use Haversine formula for spherical distance).
+     * @param latitude latitude to check.
+     * @param longitude longitude to check.
+     * @return distance from given coordinates to this whiteboard.
+     */
+    private double findDistance(double latitude, double longitude){
+        // Radius of earth in KM
+        double R = 6378.137;
+
+        // Convert to radians
+        double userLat = latitude * Math.PI / 180;
+        double userLon = longitude * Math.PI / 180;
+        double wbLat = getLatitude() * Math.PI / 180;
+        double wbLon = getLongitude() * Math.PI / 180;
+
+        // Get deltas
+        double dLat = userLat - wbLat;
+        double dLon = userLon - wbLon;
+
+        // Formula
+        double a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                Math.cos(userLat) * Math.cos(wbLat) * Math.sin(dLon/2) * Math.sin(dLon/2);
+        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+        double d = R * c;
+
+        return d * 1000; // In meters
     }
 }
