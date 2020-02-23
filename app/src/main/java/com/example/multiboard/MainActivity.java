@@ -1,15 +1,12 @@
 package com.example.multiboard;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
-import android.nfc.Tag;
-import android.os.Build;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -26,7 +23,6 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -44,8 +40,8 @@ import java.util.Comparator;
  */
 public class MainActivity extends AppCompatActivity {
 
-    //the REQUEST number for returning intents
-    public static final int REQUEST_CODE_HEAR = 4303;
+    // Request codes
+    public static final int REQUEST_CODE_PAINT = 4303;
 
     // Debugging
     private static final String TAG = "MainActivity";
@@ -287,14 +283,13 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //create a intent to point page
+    /**
+     * Create an Intent to paint the given Whiteboard.
+     * @param whiteboard the Whiteboard object to paint.
+     */
     public void openPaintingActivity(Whiteboard whiteboard){
-        Log.v(TAG, "open Login intent");
-
         Intent intent = PaintingActivity.makeIntent(MainActivity.this, whiteboard.getName());
-
-        Log.v(TAG, "hear from login");
-        startActivityForResult(intent, REQUEST_CODE_HEAR);
+        startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 
     //Return infomation on return
@@ -303,7 +298,7 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "get from PaintingActivity");
 
         switch (requestCode){
-            case REQUEST_CODE_HEAR: {
+            case REQUEST_CODE_PAINT: {
                 Log.v(TAG, "request code corect");
                 if (resultCode == Activity.RESULT_OK) {
                     Log.v(TAG, "Activity ok");
