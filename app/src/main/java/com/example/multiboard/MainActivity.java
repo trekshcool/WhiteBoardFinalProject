@@ -194,12 +194,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void cardClick(View v) {
-        // TODO: Get Whiteboard and start whiteboard activity
+        // Iterate over whiteboards in list until we find the one that was clicked
+        for (Whiteboard wb : whiteboardList) {
+            // Only open if active, ignore otherwise
+            if (wb.getCardView() == v && wb.isActive()) {
+                openPaintingActivity(wb);
+            }
+        }
     }
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "OnReume called");
+        Log.d(TAG, "onResume called");
         super.onResume();
         startLocationUpdates();
     }
@@ -219,7 +225,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStop(){
-        Log.d(TAG, "onstop called");
+        Log.d(TAG, "onStop called");
         super.onStop();
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
@@ -267,7 +273,6 @@ public class MainActivity extends AppCompatActivity {
             whiteboard.updateDistance(curLoc.getLatitude(), curLoc.getLongitude());
         }
     }
-
 
     //create a intent to point page
     public void openPaintingActivity(Whiteboard whiteboard){

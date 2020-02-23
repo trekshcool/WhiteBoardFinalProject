@@ -5,19 +5,20 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-
-import java.util.ArrayList;
+import android.widget.TextView;
 
 public class PaintingActivity extends AppCompatActivity {
 
     private static final String TAG = "PaintingActivity";
     private Whiteboard whiteboard;
-    private String whiteBoardName;
+    private String whiteboardName;
+
+    // GUI Views
+    private TextView textBoardName;
     private Button closeButton;
 
 
@@ -28,48 +29,49 @@ public class PaintingActivity extends AppCompatActivity {
 
         Log.v(TAG, "log load");
 
+        // Find views
+        textBoardName = findViewById(R.id.text_board_name);
+
         extractDataFromIntent();
         setupEndActivityButton();
     }
 
-    //Extract data from Main's intent
+    // Extract data from Main's intent
     private void extractDataFromIntent() {
         Intent intent = getIntent();
         Log.v(TAG, "get intent from Main");
 
-        whiteBoardName = intent.getStringExtra("whiteBoardName");
-        Log.v(TAG, "whiteBoardName: " + whiteBoardName);
-
+        whiteboardName = intent.getStringExtra("whiteboardName");
+        Log.v(TAG, "whiteboardName: " + whiteboardName);
         Log.v("Lab1", "finish extract");
+
+        textBoardName.setText(whiteboardName);
     }
 
     //close Painting Activity
     private void setupEndActivityButton() {
-        //setup and listen to
-        closeButton = (Button) findViewById(R.id.changeToMain);
+        // Setup and listen to
+        closeButton = findViewById(R.id.btn_change_to_main);
         closeButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
                 Intent intent = new Intent();
-//                intent.putExtra("whiteBoardName", whiteBoardName);
-//                Log.v("Lab1", intent.getStringExtra("whiteBoardName"));
 
-                //pass entry and close Paint
+                // Pass entry and close Paint
                 setResult(Activity.RESULT_OK, intent);
                 finish();
             }
         });
     }
 
-    public static Intent makeIntent(Context context, String whiteBoardName){
+    public static Intent makeIntent(Context context, String whiteboardName){
         Log.v(TAG, "make new intent");
 
         Intent intent = new Intent(context, PaintingActivity.class);
 
-        Log.v(TAG, "get Whiteboards");
-        intent.putExtra("whiteBoardName", whiteBoardName);
-        Log.v("Lab1", "name: " + whiteBoardName);
+        intent.putExtra("whiteboardName", whiteboardName);
+        Log.v(TAG, "name: " + whiteboardName);
 
         return intent;
     }

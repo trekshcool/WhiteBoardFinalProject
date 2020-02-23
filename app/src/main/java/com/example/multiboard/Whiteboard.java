@@ -6,6 +6,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
+
 import java.util.Locale;
 
 /**
@@ -24,7 +26,8 @@ public class Whiteboard {
     private double mLongitude;
     private double mRadius; // Radius of geofence circle
     private int mInkLevel;
-    private View mCardView; // CardView in list of Whiteboards
+    private boolean active = false; // Whether the Whiteboard is in range or not
+    private CardView mCardView; // CardView in list of Whiteboards
     private TextView distText;
 
     /**
@@ -76,7 +79,7 @@ public class Whiteboard {
      */
     public void setupListCard(Context context, View view) {
         // Set Whiteboard text views
-        mCardView = view;
+        mCardView = (CardView) view;
         ((TextView) view.findViewById(R.id.text_name)).setText(getName());
 
         int inkLevel = getInkLevel() * 100 / Whiteboard.MAX_INK;
@@ -111,6 +114,7 @@ public class Whiteboard {
      */
     public void activate() {
         // TODO: Make clickable and bright
+        active = true;
     }
 
     /**
@@ -118,6 +122,7 @@ public class Whiteboard {
      */
     public void deactivate() {
         // TODO: Make un-clickable and grayed
+        active = false;
     }
 
     public String getName() {
@@ -158,6 +163,14 @@ public class Whiteboard {
 
     void setInkLevel(int inkLevel) {
         mInkLevel = inkLevel;
+    }
+
+    boolean isActive() {
+        return active;
+    }
+
+    CardView getCardView() {
+        return mCardView;
     }
 
     @Override
