@@ -5,8 +5,10 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
+import android.nfc.Tag;
 import android.os.Build;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,8 +43,8 @@ import java.util.ArrayList;
  */
 public class MainActivity extends AppCompatActivity {
 
-    public static final  String GEOFENCE_ID = "MyGeofenceId";
-    private GeoLocations geoLocations = new GeoLocations(); // hold locations for Fence to use
+    //the REQUEST number for returning intents
+    public static final int REQUEST_CODE_HEAR = 4303;
 
     private static final String TAG = "MainActivity";
 
@@ -253,6 +255,39 @@ public class MainActivity extends AppCompatActivity {
         for (Whiteboard whiteboard: whiteboardList){
             Log.d(TAG, "Update Whiteboard: " + whiteboard.getName());
             whiteboard.updateDistance(curLoc.getLatitude(), curLoc.getLongitude());
+        }
+    }
+
+
+    //create a intent to point page
+    public void openPaintingActivity(Whiteboard whiteboard){
+        Log.v(TAG, "open Login intent");
+
+        Intent intent = PaintingActivity.makeIntent(MainActivity.this, whiteboard.getName());
+
+        Log.v(TAG, "hear from login");
+        startActivityForResult(intent, REQUEST_CODE_HEAR);
+    }
+
+    //Return infomation on return
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(TAG, "get from PaintingActivity");
+
+        switch (requestCode){
+            case REQUEST_CODE_HEAR: {
+                Log.v(TAG, "request code corect");
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.v(TAG, "Activity ok");
+                    //Log.v(TAG, data.getStringExtra("count"));
+                } else { // if fails
+                    Log.v(TAG, "Activity canciled");
+                }
+                break;
+            }
+            //if request is wrong
+            default:  Log.v(TAG, "request code wrong");
+                break;
         }
     }
 
