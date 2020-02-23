@@ -21,7 +21,6 @@ public class PaintingActivity extends AppCompatActivity {
     private TextView textBoardName;
     private Button closeButton;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

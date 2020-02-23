@@ -110,18 +110,26 @@ public class Whiteboard {
     }
 
     /**
-     * Makes the Whiteboard's CardView clickable and brightly colored.
+     * Makes the Whiteboard active and its CardView brightly colored.
      */
     public void activate() {
-        // TODO: Make clickable and bright
+        Context context = mCardView.getContext();
+        int colorId = R.color.color_card_active;
+        mCardView.setCardBackgroundColor(context.getResources().getColor(colorId));
+
+        // This makes the CardView respond to clicks
         active = true;
     }
 
     /**
-     * Makes the Whiteboard's CardView unclickable and grayed out.
+     * Makes the Whiteboard inactive and its CardView grayed out.
      */
     public void deactivate() {
-        // TODO: Make un-clickable and grayed
+        Context context = mCardView.getContext();
+        int colorId = R.color.color_card_inactive;
+        mCardView.setCardBackgroundColor(context.getResources().getColor(colorId));
+
+        // This makes the CardView ignore clicks
         active = false;
     }
 
