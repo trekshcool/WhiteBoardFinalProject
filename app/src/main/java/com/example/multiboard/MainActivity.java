@@ -178,9 +178,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Begin realtime update listening
         startLocationUpdates();
-//
-//        requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
-//                Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
+
+        requestPermissions(new String[] {Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION}, 1234);
     }
 
     @Override
@@ -233,9 +233,9 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Updating");
 
         //Store the new Location
+        curLoc = loc;
         if (curLoc != null) {
             Log.d(TAG, "LAT: " + loc.getLatitude() + ", LON: " + loc.getLongitude());
-            curLoc = loc;
         }
     }
 
