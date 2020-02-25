@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseReference mFirebaseDatabaseReference;
 
     // User information
-    private int mUserId;
+    private String mUserId;
 
     // Location variables
     Location curLoc;
@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity {
         mSharedPreferences = getSharedPreferences(mSharedPrefFile, MODE_PRIVATE);
 
         // Initialize user ID
-        mUserId = 0;
+        mUserId = "";
 
         // Find views
         linearWhiteboards = findViewById(R.id.linear_whiteboards);
@@ -132,15 +132,17 @@ public class MainActivity extends AppCompatActivity {
             // Anonymize user data by hashing the name to create an ID number before storing it
             String dispName = mFirebaseUser.getDisplayName();
             if (dispName != null) {
-                mUserId = dispName.hashCode();
+                mUserId = Integer.toString(dispName.hashCode());
                 Log.d(TAG, dispName);
-                Log.d(TAG, Integer.toString(mUserId));
+                Log.d(TAG, mUserId);
             }
         }
 
         // Firebase data
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mFirebaseDatabaseReference.child("whiteboards").addValueEventListener(whiteboardListener);
+        mFirebaseDatabaseReference
+                .child("whiteboards")
+                .addValueEventListener(whiteboardListener);
 
         // Whiteboards
         whiteboardList = new ArrayList<>();
@@ -287,7 +289,10 @@ public class MainActivity extends AppCompatActivity {
      * @param whiteboard the Whiteboard object to paint.
      */
     public void openPaintingActivity(Whiteboard whiteboard){
-        Intent intent = PaintingActivity.makeIntent(MainActivity.this, whiteboard.getName());
+        Intent intent = PaintingActivity.makeIntent(
+                MainActivity.this,
+                whiteboard.getName(),
+                mUserId);
         startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 

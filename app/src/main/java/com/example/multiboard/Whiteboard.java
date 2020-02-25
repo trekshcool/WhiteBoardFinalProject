@@ -27,8 +27,8 @@ public class Whiteboard implements Comparable<Whiteboard> {
 
     // Constants
     private final static String TAG = "Whiteboard";
-    private final static int WIDTH = 5000;
-    private final static int HEIGHT = 5000;
+    private final static int WIDTH = 5;
+    private final static int HEIGHT = 5;
     public final static int MAX_INK = 150;
 
     // Whiteboard variables
@@ -80,12 +80,14 @@ public class Whiteboard implements Comparable<Whiteboard> {
         }
     }
 
-    public void writePixel(int pixelId, Pixel newPixel) {
-        // Get coords
-        int x = getXFromId(pixelId);
-        int y = getYFromId(pixelId);
-
-        // Keep new Pixel object
+    /**
+     * Stores a new Pixel object at the given coordinate in the board data.
+     * @param x the x-coordinate for the Pixel to write to.
+     * @param y the y-coordinate for the Pixel to write to.
+     * @param newPixel the new Pixel object to store here.
+     */
+    public void writePixel(int x, int y, Pixel newPixel) {
+        // Write new Pixel object
         mBoard[x][y] = newPixel;
     }
 

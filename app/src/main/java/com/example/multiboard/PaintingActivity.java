@@ -30,10 +30,11 @@ public class PaintingActivity extends AppCompatActivity {
     private String whiteboardName;
 
     // GUI Views
+    private boolean isPixelGUISetup = false;
     private TextView textBoardName;
 
     // User information
-    private int mUserId;
+    private String mUserId;
 
     // Firebase variables
     private FirebaseAuth mFirebaseAuth;
@@ -81,15 +82,17 @@ public class PaintingActivity extends AppCompatActivity {
                     continue;
                 }
 
-                // Get pixel ID
+                // Get pixel coordinates
                 int pixelId = Integer.parseInt(ds.getKey());
+                int x = whiteboard.getXFromId(pixelId);
+                int y = whiteboard.getYFromId(pixelId);
 
                 // Get Pixel object from database and write to the Whiteboard object
                 Pixel newPixel = ds.getValue(Pixel.class);
-                whiteboard.writePixel(pixelId, newPixel);
+                whiteboard.writePixel(x, y, newPixel);
 
                 // Update GUI
-                updatePixelGUI(pixelId);
+                updatePixelGUI(pixelId, newPixel.getColor());
             }
         }
 
@@ -114,33 +117,56 @@ public class PaintingActivity extends AppCompatActivity {
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        if (mFirebaseUser == null) {
-            // Not signed in, launch the Sign In activity
-            startActivity(new Intent(this, SignInActivity.class));
-            finish();
-        } else {
-            // Anonymize user data by hashing the name to create an ID number before storing it
-            String dispName = mFirebaseUser.getDisplayName();
-            if (dispName != null) {
-                mUserId = dispName.hashCode();
-                Log.d(TAG, dispName);
-                Log.d(TAG, Integer.toString(mUserId));
-            }
-        }
 
         // Get Whiteboard data from Firebase
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
-        mFirebaseDatabaseReference.child("whiteboards").child(whiteboardName)
+        mFirebaseDatabaseReference
+                .child("whiteboards")
+                .child(whiteboardName)
                 .addValueEventListener(whiteboardListener);
 
         // Get Whiteboard Pixel data and start listening for Pixel updates
         whiteboard.initBoard();
-        mFirebaseDatabaseReference.child("board-data").child(whiteboardName)
+        mFirebaseDatabaseReference
+                .child("board-data")
+                .child(whiteboardName)
                 .addValueEventListener(pixelListener);
     }
 
-    private void updatePixelGUI(int pixelId) {
+    private void colorPixel(int x, int y, int color) {
+        // Write to local Whiteboard object
+        Pixel pixel = new Pixel(mUserId, color);
+        whiteboard.writePixel(x, y, pixel);
 
+        // Upload new Pixel object to database
+        int pixelId = whiteboard.getIdFromXY(x, y);
+        mFirebaseDatabaseReference
+                .child("board-data")
+                .child(whiteboardName)
+                .child(Integer.toString(pixelId))
+                .setValue(pixel);
+
+        // Update GUI
+        updatePixelGUI(pixelId, color);
+    }
+
+    private void updatePixelGUI(int pixelId, int newColor) {
+        // Make sure the GUI board exists
+        if (!isPixelGUISetup) {
+            setupPixelGUI();
+        }
+
+        // TODO: Update the GUI with the new Pixel color
+    }
+
+    /**
+     * Called after the Whiteboard data has been fetched from the database, but before any calls
+     * to updatePixelGUI().
+     */
+    private void setupPixelGUI() {
+        // TODO: Create a bunch of pixel Views in the GUI based on the current whiteboard
+
+        isPixelGUISetup = true;
     }
 
     /**
@@ -148,20 +174,27 @@ public class PaintingActivity extends AppCompatActivity {
      */
     private void extractDataFromIntent() {
         Intent intent = getIntent();
+
+        // Get Whiteboard name
         whiteboardName = intent.getStringExtra("whiteboardName");
         textBoardName.setText(whiteboardName);
+
+        // Get user's ID
+        mUserId = intent.getStringExtra("userID");
     }
 
     /**
      * Create an Intent to launch the PaintingActivity with the given Whiteboard name.
      * @param context current context to launch the Activity with.
      * @param whiteboardName the name of the Whiteboard to paint on.
+     * @param userId the ID of the current user.
      * @return the new Intent ready to be started.
      */
-    public static Intent makeIntent(Context context, String whiteboardName) {
+    public static Intent makeIntent(Context context, String whiteboardName, String userId) {
         // Create the intent with an extra for the Whiteboard name
         Intent intent = new Intent(context, PaintingActivity.class);
         intent.putExtra("whiteboardName", whiteboardName);
+        intent.putExtra("userId", userId);
         return intent;
     }
 }
