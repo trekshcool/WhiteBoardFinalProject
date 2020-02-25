@@ -3,12 +3,18 @@ package com.example.multiboard;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Comparator;
 import java.util.Locale;
@@ -20,6 +26,7 @@ import java.util.Locale;
 public class Whiteboard implements Comparable<Whiteboard> {
 
     // Constants
+    private final static String TAG = "Whiteboard";
     private final static int WIDTH = 5000;
     private final static int HEIGHT = 5000;
     public final static int MAX_INK = 150;
@@ -65,19 +72,12 @@ public class Whiteboard implements Comparable<Whiteboard> {
     /**
      * Initialize a blank board of new Pixels.
      */
-    private void initBoard() {
+    public void initBoard() {
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
                 mBoard[i][j] = new Pixel();
             }
         }
-    }
-
-    /**
-     * Load in and start listening for Pixel data from the database's board-data node.
-     */
-    private void loadBoard() {
-        // TODO: Get pixel data from database and write to board
     }
 
     /**
