@@ -80,6 +80,15 @@ public class Whiteboard implements Comparable<Whiteboard> {
         }
     }
 
+    public void writePixel(int pixelId, Pixel newPixel) {
+        // Get coords
+        int x = getXFromId(pixelId);
+        int y = getYFromId(pixelId);
+
+        // Keep new Pixel object
+        mBoard[x][y] = newPixel;
+    }
+
     /**
      * Prints all the necessary data to a given Whiteboard list card.
      * @param context the current context (for resource access).
@@ -96,6 +105,46 @@ public class Whiteboard implements Comparable<Whiteboard> {
 
         distText = view.findViewById(R.id.text_dist);
         distText.setText(R.string.default_dist_text);
+    }
+
+    /**
+     * Calculate the x-coordinate for the given pixelId.
+     * @param pixelId ID of the Pixel.
+     * @return the x-coordinate of the Pixel. -1 if invalid ID.
+     */
+    public int getXFromId(int pixelId) {
+        if (0 <= pixelId && pixelId < WIDTH * HEIGHT) {
+            return pixelId % WIDTH;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Calculate the y-coordinate for the given pixelId.
+     * @param pixelId ID of the Pixel.
+     * @return the y-coordinate of the Pixel. -1 if invalid ID.
+     */
+    public int getYFromId(int pixelId) {
+        if (0 <= pixelId && pixelId < WIDTH * HEIGHT) {
+            return pixelId / WIDTH;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Calculate the ID for the given Pixel coordinates.
+     * @param x x-coordinate of the Pixel.
+     * @param x y-coordinate of the Pixel.
+     * @return the ID of the Pixel.
+     */
+    public int getIdFromXY(int x, int y) {
+        if (0 <= x && x < WIDTH && 0 <= y && y < HEIGHT) {
+            return y * WIDTH + x;
+        } else {
+            return -1;
+        }
     }
 
     /**

@@ -43,8 +43,8 @@ public class PaintingActivity extends AppCompatActivity {
     // Callback for Firebase Whiteboard data
     ValueEventListener whiteboardListener = new ValueEventListener() {
         /**
-         * This method is called when the Activity is started to get information for the current
-         * Whiteboard.
+         * This method is called when the Activity is started to get information
+         * for the current Whiteboard.
          * @param dataSnapshot new data.
          */
         @Override
@@ -76,9 +76,20 @@ public class PaintingActivity extends AppCompatActivity {
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
             // Iterate over all modified Pixels
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                // Get Pixel object from database
+                if (ds.getKey() == null) {
+                    Log.e(TAG, "DataSnapshot key is null");
+                    continue;
+                }
+
+                // Get pixel ID
+                int pixelId = Integer.parseInt(ds.getKey());
+
+                // Get Pixel object from database and write to the Whiteboard object
                 Pixel newPixel = ds.getValue(Pixel.class);
-                // TODO: write pixel data based on database index (key)
+                whiteboard.writePixel(pixelId, newPixel);
+
+                // Update GUI
+                updatePixelGUI(pixelId);
             }
         }
 
@@ -126,6 +137,10 @@ public class PaintingActivity extends AppCompatActivity {
         whiteboard.initBoard();
         mFirebaseDatabaseReference.child("board-data").child(whiteboardName)
                 .addValueEventListener(pixelListener);
+    }
+
+    private void updatePixelGUI(int pixelId) {
+
     }
 
     /**
