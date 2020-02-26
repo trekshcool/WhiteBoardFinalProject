@@ -194,38 +194,69 @@ public class Whiteboard implements Comparable<Whiteboard> {
         active = false;
     }
 
+    /**
+     * @return Whiteboard name
+     */
     public String getName() {
         return mName;
     }
 
+    /**
+     * set Whiteboard name
+     * @param name
+     */
     public void setName(String name) {
         mName = name;
     }
 
+    /**
+     * @return whiteboeard Latitude
+     */
     public double getLatitude() {
         return mLatitude;
     }
 
+    /**
+     * set whiteboeard Latitude location
+     * @param mLatitude
+     */
     public void setLatitude(double mLatitude) {
         this.mLatitude = mLatitude;
     }
 
+    /**
+     * @return whiteboeard Latitude
+     */
     public double getLongitude() {
         return mLongitude;
     }
 
+    /**
+     * set whiteboeard Longitude location
+     * @param mLongitude
+     */
     public void setLongitude(double mLongitude) {
         this.mLongitude = mLongitude;
     }
 
+    /**
+     * @return Radius area from whiteboeard center in meters
+     */
     public double getRadius() {
         return mRadius;
     }
 
+    /**
+     * set Radius area from whiteboeard center
+     * @param mRadius in meters
+     */
     public void setRadius(double mRadius) {
         this.mRadius = mRadius;
     }
 
+    /**
+     * @return return amount of ink user has left
+     */
     int getInkLevel() {
         return mInkLevel;
     }
