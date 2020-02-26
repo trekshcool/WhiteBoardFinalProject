@@ -11,6 +11,7 @@ import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -140,6 +141,16 @@ public class PaintingActivity extends AppCompatActivity {
                 .child("board-data")
                 .child(whiteboardName)
                 .addValueEventListener(pixelListener);
+
+        ImageButton popb = (ImageButton) findViewById(R.id.paintMenu);
+
+        popb.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(PaintingActivity.this, PaintPopUp.class));
+            }
+        });
     }
 
     private void colorPixel(int x, int y, int color) {

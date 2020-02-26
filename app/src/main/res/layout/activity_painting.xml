@@ -6,20 +6,41 @@
     android:layout_height="match_parent"
     tools:context=".PaintingActivity">
 
+    <com.example.multiboard.PaintView
+        android:id="@+id/paint"
+        android:layout_width="405dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/paintMenu" />
+
+    <ImageButton
+        android:id="@+id/paintMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/paint"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.91"
+        app:layout_constraintStart_toEndOf="@+id/text_board_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.42000002"
+        app:srcCompat="@android:drawable/ic_menu_edit" />
+
     <TextView
         android:id="@+id/text_board_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:text="@string/text_board_name_default"
         android:textSize="18sp"
         android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/paint"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.029" />
 
-    <com.example.multiboard.PaintView
-        android:id="@+id/paint"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>
