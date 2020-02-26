@@ -16,21 +16,19 @@ import java.util.ArrayList;
 
 public class PaintView extends View {
 
-    public static int DEFAULT_SIZE = 20;
+    public static float DEFAULT_SIZE = 20f;
     public static final int DEFAULT_COLOR = Color.RED;
     private static final float TOUCH_TOLERANCE = 4;
     private float mX, mY;
     private Path path;
     private Paint paint;
     private ArrayList<StrokePath> paths = new ArrayList<>();
-    private int currentColor;
-    private int strokeWidth;
+    private int currentColor = DEFAULT_COLOR;
+    private float strokeWidth = DEFAULT_SIZE;
     private Bitmap bitmap;
     private Canvas canvas;
     private Paint bitmapPaint = new Paint(Paint.DITHER_FLAG);
 
-    private int currentColor ;
-    private float strokeWidth;
 
     public PaintView(Context context) {
         this(context, null);

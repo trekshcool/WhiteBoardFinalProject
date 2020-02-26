@@ -211,7 +211,7 @@ public class PaintingActivity extends AppCompatActivity {
      * @param userId the ID of the current user.
      * @return the new Intent ready to be started.
      */
-    public static Intent makeIntent(Context context, int whiteboardName, float userId) {
+    public static Intent makeIntent(Context context, String whiteboardName, String userId) {
         // Create the intent with an extra for the Whiteboard name
         Intent intent = new Intent(context, PaintingActivity.class);
         intent.putExtra("whiteboardName", whiteboardName);
@@ -225,7 +225,7 @@ public class PaintingActivity extends AppCompatActivity {
      * @param paint the PaintView object to paint.
      */
     public void openPaintPopUp(PaintView paint ){
-        Intent intent = PaintingActivity.makeIntent(
+        Intent intent = PaintPopUp.makeIntent(
                 PaintingActivity.this,
                 paint.getColor(),
                 paint.getStrokeWidth());

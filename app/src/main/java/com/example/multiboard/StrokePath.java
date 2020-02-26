@@ -8,7 +8,7 @@ public class StrokePath {
     private int strokeWidth;
     private Path path;
 
-    public StrokePath(int color, int strokeWidth, Path path) {
+    public StrokePath(int color, float strokeWidth, Path path) {
         this.color = color;
         this.strokeWidth = strokeWidth;
         this.path = path;
