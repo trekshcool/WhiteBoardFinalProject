@@ -7,16 +7,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import java.util.ArrayList;
 
 
 public class PaintView extends View {
 
-    public static int DEFAULT_SIZE = 20;
+    public static int DEFAULT_SIZE = 8;
     public static final int DEFAULT_COLOR = Color.RED;
     private static final float TOUCH_TOLERANCE = 4;
     private float mX, mY;
@@ -25,6 +25,7 @@ public class PaintView extends View {
     private ArrayList<StrokePath> paths = new ArrayList<>();
     private int currentColor;
     private int strokeWidth;
+    private boolean isScaled = false;
     private Bitmap bitmap;
     private Canvas canvas;
     private Paint bitmapPaint = new Paint(Paint.DITHER_FLAG);
@@ -36,7 +37,7 @@ public class PaintView extends View {
     public PaintView(Context context, AttributeSet attrs) {
         super(context, attrs);
         paint = new Paint();
-        paint.setAntiAlias(true);
+        paint.setAntiAlias(false);
         paint.setDither(true);
         paint.setColor(DEFAULT_COLOR);
         paint.setStyle(Paint.Style.STROKE);
@@ -46,19 +47,42 @@ public class PaintView extends View {
         paint.setAlpha(0xff);
     }
 
-    public void init(DisplayMetrics metrics) {
-        int height = metrics.heightPixels;
-        int width = metrics.widthPixels;
-
+    public void init(int width, int height) {
+        // Create canvas from a bitmap
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
 
+        // Initialize brush
         currentColor = DEFAULT_COLOR;
         strokeWidth = DEFAULT_SIZE;
     }
 
+    public void rescaleCanvas() {
+        // Get dimensions
+        int screenWidth = getMeasuredWidth();
+        int screenHeight = getMeasuredHeight();
+        int canvasWidth = canvas.getWidth();
+        int canvasHeight = canvas.getHeight();
+
+        // Scale canvas to fit Whiteboard onto the screen
+        setScaleX((float) screenWidth / canvasWidth);
+        setScaleY((float) screenHeight / canvasHeight);
+
+        // Resize canvas to match Whiteboard dimensions
+        ViewGroup.LayoutParams layoutParams = getLayoutParams();
+        layoutParams.width = canvasWidth;
+        layoutParams.height = canvasHeight;
+        setLayoutParams(layoutParams);
+    }
+
     @Override
     protected void onDraw(Canvas canvas) {
+        // Re-scale the canvas, if it hasn't been done yet
+        if (!isScaled) {
+            isScaled = true;
+            rescaleCanvas();
+        }
+
         canvas.save();
         //canvas.drawColor(backgroundColor);
 

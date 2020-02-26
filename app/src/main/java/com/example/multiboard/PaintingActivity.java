@@ -59,6 +59,7 @@ public class PaintingActivity extends AppCompatActivity {
                 if (dsWhiteboard.getName().equals(whiteboardName)) {
                     whiteboard = dsWhiteboard;
                     whiteboard.initBoard();
+                    paintView.init(Whiteboard.WIDTH, Whiteboard.HEIGHT);
                 }
             }
         }
@@ -114,13 +115,9 @@ public class PaintingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_painting);
 
-        paintView = findViewById(R.id.paint);
-        DisplayMetrics metrics = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(metrics);
-        paintView.init(metrics);
-
         // Find views
         textBoardName = findViewById(R.id.text_board_name);
+        paintView = findViewById(R.id.paint);
 
         // Setup Whiteboard using the extras that were passed in
         extractDataFromIntent();

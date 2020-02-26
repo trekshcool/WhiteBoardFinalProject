@@ -27,8 +27,8 @@ public class Whiteboard implements Comparable<Whiteboard> {
 
     // Constants
     private final static String TAG = "Whiteboard";
-    private final static int WIDTH = 5;
-    private final static int HEIGHT = 5;
+    final static int WIDTH = 1400;
+    final static int HEIGHT = 2000;
     public final static int MAX_INK = 150;
 
     // Whiteboard variables
