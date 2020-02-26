@@ -24,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 
 public class PaintingActivity extends AppCompatActivity {
 
+    public static final int REQUEST_CODE_PAINT = 4345;
+
     // Debugging
     private static final String TAG = "PaintingActivity";
 
@@ -216,5 +218,42 @@ public class PaintingActivity extends AppCompatActivity {
         intent.putExtra("whiteboardName", whiteboardName);
         intent.putExtra("userId", userId);
         return intent;
+    }
+
+
+    /**
+     * Create an Intent to popup the given paint and pointsize.
+     * @param whiteboard the Whiteboard object to paint.
+     */
+    public void openPaintPopUp(PaintView paint ){
+        Intent intent = PaintingActivity.makeIntent(
+                PaintingActivity.this,
+                paint.getColor,
+                paint.getStrokeWidth);
+        startActivityForResult(intent, REQUEST_CODE_PAINT);
+    }
+
+    //Return infomation on return
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(TAG, "get from PaintingActivity");
+
+        switch (requestCode){
+            case REQUEST_CODE_PAINT: {
+                Log.v(TAG, "request code corect");
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.v(TAG, "Activity ok");
+                    //Log.v(TAG, data.getStringExtra("count"));
+                    setColor(data.getIntExtra("color"));
+                    setStrokeWidth(data.getIntExtra("Size"))
+                } else { // if fails
+                    Log.v(TAG, "Activity canciled");
+                }
+                break;
+            }
+            //if request is wrong
+            default:  Log.v(TAG, "request code wrong");
+                break;
+        }
     }
 }
