@@ -149,7 +149,8 @@ public class PaintingActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(PaintingActivity.this, PaintPopUp.class));
+                Log.v(TAG,"oppen Paintpopup");
+                openPaintPopUp(paintView);
             }
         });
     }
@@ -222,13 +223,14 @@ public class PaintingActivity extends AppCompatActivity {
 
     /**
      * Create an Intent to popup the given paint and pointsize.
-     * @param paint the PaintView object to paint.
+     * @param paintView the PaintView object to paint.
      */
-    public void openPaintPopUp(PaintView paint ){
+    public void openPaintPopUp(PaintView paintView ){
         Intent intent = PaintPopUp.makeIntent(
                 PaintingActivity.this,
-                paint.getColor(),
-                paint.getStrokeWidth());
+                paintView.getColor(),
+                paintView.getStrokeWidth());
+        Log.v(TAG, "intent sent");
         startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 

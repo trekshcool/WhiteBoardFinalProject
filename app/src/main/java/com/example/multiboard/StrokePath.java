@@ -5,7 +5,7 @@ import android.graphics.Path;
 public class StrokePath {
 
     private int color;
-    private int strokeWidth;
+    private float strokeWidth;
     private Path path;
 
     public StrokePath(int color, float strokeWidth, Path path) {
@@ -18,7 +18,7 @@ public class StrokePath {
         return color;
     }
 
-    public int getStrokeWidth() {
+    public float getStrokeWidth() {
         return strokeWidth;
     }
 
