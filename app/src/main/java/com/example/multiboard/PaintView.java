@@ -29,6 +29,9 @@ public class PaintView extends View {
     private Canvas canvas;
     private Paint bitmapPaint = new Paint(Paint.DITHER_FLAG);
 
+    private int currentColor ;
+    private float strokeWidth;
+
     public PaintView(Context context) {
         this(context, null);
     }
@@ -121,5 +124,21 @@ public class PaintView extends View {
         }
 
         return true;
+    }
+
+    public int getColor() {
+        return bitmapPaint.getColor();
+    }
+
+    public float getStrokeWidth() {
+        return bitmapPaint.getStrokeWidth();
+    }
+
+    public void setStrokeWidth(float size) {
+        bitmapPaint.setStrokeWidth(size);
+    }
+
+    public void setColor(int color) {
+        bitmapPaint.setColor(color);
     }
 }

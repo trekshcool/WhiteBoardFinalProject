@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
@@ -212,7 +211,7 @@ public class PaintingActivity extends AppCompatActivity {
      * @param userId the ID of the current user.
      * @return the new Intent ready to be started.
      */
-    public static Intent makeIntent(Context context, String whiteboardName, String userId) {
+    public static Intent makeIntent(Context context, int whiteboardName, float userId) {
         // Create the intent with an extra for the Whiteboard name
         Intent intent = new Intent(context, PaintingActivity.class);
         intent.putExtra("whiteboardName", whiteboardName);
@@ -223,13 +222,13 @@ public class PaintingActivity extends AppCompatActivity {
 
     /**
      * Create an Intent to popup the given paint and pointsize.
-     * @param whiteboard the Whiteboard object to paint.
+     * @param paint the PaintView object to paint.
      */
     public void openPaintPopUp(PaintView paint ){
         Intent intent = PaintingActivity.makeIntent(
                 PaintingActivity.this,
-                paint.getColor,
-                paint.getStrokeWidth);
+                paint.getColor(),
+                paint.getStrokeWidth());
         startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 
@@ -244,8 +243,8 @@ public class PaintingActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     Log.v(TAG, "Activity ok");
                     //Log.v(TAG, data.getStringExtra("count"));
-                    setColor(data.getIntExtra("color"));
-                    setStrokeWidth(data.getIntExtra("Size"))
+                    paintView.setColor(data.getIntExtra("color",0));
+                    paintView.setStrokeWidth(data.getFloatExtra("Size", 0f));
                 } else { // if fails
                     Log.v(TAG, "Activity canciled");
                 }
