@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -32,6 +33,7 @@ public class PaintingActivity extends AppCompatActivity {
     // GUI Views
     private boolean isPixelGUISetup = false;
     private TextView textBoardName;
+    private PaintView paintView;
 
     // User information
     private String mUserId;
@@ -53,7 +55,11 @@ public class PaintingActivity extends AppCompatActivity {
             // Iterate over all modified whiteboards
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
                 // Get Whiteboard object from database
-                whiteboard = ds.getValue(Whiteboard.class);
+                Whiteboard dsWhiteboard = ds.getValue(Whiteboard.class);
+                if (dsWhiteboard.getName().equals(whiteboardName)) {
+                    whiteboard = dsWhiteboard;
+                    whiteboard.initBoard();
+                }
             }
         }
 
@@ -108,6 +114,11 @@ public class PaintingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_painting);
 
+        paintView = findViewById(R.id.paint);
+        DisplayMetrics metrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(metrics);
+        paintView.init(metrics);
+
         // Find views
         textBoardName = findViewById(R.id.text_board_name);
 
@@ -122,11 +133,9 @@ public class PaintingActivity extends AppCompatActivity {
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseDatabaseReference
                 .child("whiteboards")
-                .child(whiteboardName)
                 .addValueEventListener(whiteboardListener);
 
         // Get Whiteboard Pixel data and start listening for Pixel updates
-        whiteboard.initBoard();
         mFirebaseDatabaseReference
                 .child("board-data")
                 .child(whiteboardName)

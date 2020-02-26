@@ -73,6 +73,7 @@ public class Whiteboard implements Comparable<Whiteboard> {
      * Initialize a blank board of new Pixels.
      */
     public void initBoard() {
+        mBoard = new Pixel[WIDTH][HEIGHT];
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
                 mBoard[i][j] = new Pixel();
