@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuPopupHelper;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -14,7 +13,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -27,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class PaintingActivity extends AppCompatActivity {
 
-    public static final int REQUEST_CODE_PAINT = 4345;
+//    public static final int REQUEST_CODE_PAINT = 4345;
 
     // Debugging
     private static final String TAG = "PaintingActivity";
@@ -35,6 +33,17 @@ public class PaintingActivity extends AppCompatActivity {
     // Whiteboard variables
     private Whiteboard whiteboard;
     private String whiteboardName;
+
+    // Paint colors
+    private int BLACK = 0xFF000000;
+    private int RED = 0xFFA61A1A;
+    private int ORANGE = 0xFFD9971E;
+    private int YELLOW = 0xFFD3D91E;
+    private int GREEN = 0xFF2B7B36;
+    private int BLUE = 0xFF2B2D7A;
+    private int PURPLE = 0xFF6B4C9E;
+    private int PINK = 0xFFF586B6;
+    private int BROWN = 0xFF6C4F30;
 
     // GUI Views
     private boolean isPixelGUISetup = false;
@@ -120,17 +129,45 @@ public class PaintingActivity extends AppCompatActivity {
 
     // Popup menu callback
     MenuBuilder.Callback popupListener = new MenuBuilder.Callback() {
+        /**
+         * This method is called when an item in the popup menu is clicked.
+         * @param builder the menu that was clicked.
+         * @param item the MenuItem that was clicked.
+         * @return true if the event was handled.
+         */
         @Override
         public boolean onMenuItemSelected(MenuBuilder builder, MenuItem item) {
             switch (item.getTitle().toString()) {
                 case "Black":
-                    // TODO: Set colors
+                    paintView.setColor(BLACK);
                     return true;
                 case "Red":
-                    // TODO: Set colors
+                    paintView.setColor(RED);
+                    return true;
+                case "Orange":
+                    paintView.setColor(ORANGE);
+                    return true;
+                case "Yellow":
+                    paintView.setColor(YELLOW);
+                    return true;
+                case "Green":
+                    paintView.setColor(GREEN);
+                    return true;
+                case "Blue":
+                    paintView.setColor(BLUE);
+                    return true;
+                case "Purple":
+                    paintView.setColor(PURPLE);
+                    return true;
+                case "Pink":
+                    paintView.setColor(PINK);
+                    return true;
+                case "Brown":
+                    paintView.setColor(BROWN);
                     return true;
             }
 
+            // Event not handled
             return false;
         }
 
@@ -259,10 +296,10 @@ public class PaintingActivity extends AppCompatActivity {
 
 
     /**
-     * Create an Intent to popup the given paint and pointsize.
+     * Display the Popup Menu (called when buttonPopup is clicked).
+     * @param view the button that was clicked.
      */
     public void openPopupPaint(View view){
-        Log.d(TAG, "Opening popup");
         popupPaint.show();
 //        Intent intent = PaintingActivity.makeIntent(
 //                PaintingActivity.this,
@@ -271,27 +308,27 @@ public class PaintingActivity extends AppCompatActivity {
 //        startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 
-    //Return infomation on return
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v(TAG, "get from PaintingActivity");
-
-        switch (requestCode){
-            case REQUEST_CODE_PAINT: {
-                Log.v(TAG, "request code corect");
-                if (resultCode == Activity.RESULT_OK) {
-                    Log.v(TAG, "Activity ok");
-                    //Log.v(TAG, data.getStringExtra("count"));
-                    //setColor(data.getIntExtra("color"));
-                    //setStrokeWidth(data.getIntExtra("Size"));
-                } else { // if fails
-                    Log.v(TAG, "Activity canciled");
-                }
-                break;
-            }
-            //if request is wrong
-            default:  Log.v(TAG, "request code wrong");
-                break;
-        }
-    }
+//    // Return infomation on return
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        Log.v(TAG, "get from PaintingActivity");
+//
+//        switch (requestCode){
+//            case REQUEST_CODE_PAINT: {
+//                Log.v(TAG, "request code corect");
+//                if (resultCode == Activity.RESULT_OK) {
+//                    Log.v(TAG, "Activity ok");
+//                    //Log.v(TAG, data.getStringExtra("count"));
+//                    //setColor(data.getIntExtra("color"));
+//                    //setStrokeWidth(data.getIntExtra("Size"));
+//                } else { // if fails
+//                    Log.v(TAG, "Activity canciled");
+//                }
+//                break;
+//            }
+//            //if request is wrong
+//            default:  Log.v(TAG, "request code wrong");
+//                break;
+//        }
+//    }
 }

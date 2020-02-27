@@ -146,4 +146,22 @@ public class PaintView extends View {
 
         return true;
     }
+
+    /**
+     * Sets the color of the brush to paint with.
+     * @param color the int color of the brush.
+     */
+    public void setColor(int color) {
+        currentColor = color;
+        bitmapPaint.setColor(color);
+    }
+
+    /**
+     * Sets the width of the brush to paint with.
+     * @param width the radius of the brush stroke.
+     */
+    public void setStrokeWidth(int width) {
+        strokeWidth = width;
+        bitmapPaint.setStrokeWidth(width);
+    }
 }
