@@ -31,8 +31,8 @@ class PaintPopUp extends Activity {
         Intent intent = getIntent();
 
         // Get Whiteboard name
-        mainColor = intent.getIntExtra("color");
-        mainSize = intent.getIntExtra("size");
+//        mainColor = intent.getIntExtra("color");
+//        mainSize = intent.getIntExtra("size");
 
     }
 

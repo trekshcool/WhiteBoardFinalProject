@@ -2,16 +2,19 @@ package com.example.multiboard;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
+import androidx.appcompat.view.menu.MenuPopupHelper;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -37,6 +40,8 @@ public class PaintingActivity extends AppCompatActivity {
     private boolean isPixelGUISetup = false;
     private TextView textBoardName;
     private PaintView paintView;
+    private ImageButton buttonPopup;
+    private MenuPopupHelper popupPaint;
 
     // User information
     private String mUserId;
@@ -113,14 +118,43 @@ public class PaintingActivity extends AppCompatActivity {
         }
     };
 
+    // Popup menu callback
+    MenuBuilder.Callback popupListener = new MenuBuilder.Callback() {
+        @Override
+        public boolean onMenuItemSelected(MenuBuilder builder, MenuItem item) {
+            switch (item.getTitle().toString()) {
+                case "Black":
+                    // TODO: Set colors
+                    return true;
+                case "Red":
+                    // TODO: Set colors
+                    return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public void onMenuModeChange(MenuBuilder builder) {}
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_painting);
 
-        // Find views
+        // GUI
         textBoardName = findViewById(R.id.text_board_name);
         paintView = findViewById(R.id.paint);
+        buttonPopup = findViewById(R.id.button_popup);
+
+        // Popup GUI
+        MenuBuilder menuBuilder = new MenuBuilder(this);
+        MenuInflater inflater = new MenuInflater(this);
+        inflater.inflate(R.menu.popup_paint, menuBuilder);
+        popupPaint = new MenuPopupHelper(this, menuBuilder, buttonPopup);
+        popupPaint.setForceShowIcon(true);
+        menuBuilder.setCallback(popupListener);
 
         // Setup Whiteboard using the extras that were passed in
         extractDataFromIntent();
@@ -141,15 +175,21 @@ public class PaintingActivity extends AppCompatActivity {
                 .child(whiteboardName)
                 .addValueEventListener(pixelListener);
 
-        ImageButton popb = (ImageButton) findViewById(R.id.paintMenu);
+//        ImageButton popb = (ImageButton) findViewById(R.id.paintMenu);
+//
+//        popb.setOnClickListener(new View.OnClickListener() {
+//
+//            @Override
+//            public void onClick(View view) {
+//                startActivity(new Intent(PaintingActivity.this, popupPaint.class));
+//            }
+//        });
+    }
 
-        popb.setOnClickListener(new View.OnClickListener() {
-
-            @Override
-            public void onClick(View view) {
-                startActivity(new Intent(PaintingActivity.this, PaintPopUp.class));
-            }
-        });
+    @Override
+    protected void onStop() {
+        super.onStop();
+        whiteboard.deleteBoard();
     }
 
     private void colorPixel(int x, int y, int color) {
@@ -220,14 +260,15 @@ public class PaintingActivity extends AppCompatActivity {
 
     /**
      * Create an Intent to popup the given paint and pointsize.
-     * @param whiteboard the Whiteboard object to paint.
      */
-    public void openPaintPopUp(PaintView paint ){
-        Intent intent = PaintingActivity.makeIntent(
-                PaintingActivity.this,
-                paint.getColor,
-                paint.getStrokeWidth);
-        startActivityForResult(intent, REQUEST_CODE_PAINT);
+    public void openPopupPaint(View view){
+        Log.d(TAG, "Opening popup");
+        popupPaint.show();
+//        Intent intent = PaintingActivity.makeIntent(
+//                PaintingActivity.this,
+//                paint.getColor,
+//                paint.getStrokeWidth);
+//        startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 
     //Return infomation on return
@@ -241,8 +282,8 @@ public class PaintingActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     Log.v(TAG, "Activity ok");
                     //Log.v(TAG, data.getStringExtra("count"));
-                    setColor(data.getIntExtra("color"));
-                    setStrokeWidth(data.getIntExtra("Size"))
+                    //setColor(data.getIntExtra("color"));
+                    //setStrokeWidth(data.getIntExtra("Size"));
                 } else { // if fails
                     Log.v(TAG, "Activity canciled");
                 }

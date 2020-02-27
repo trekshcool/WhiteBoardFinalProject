@@ -82,6 +82,13 @@ public class Whiteboard implements Comparable<Whiteboard> {
     }
 
     /**
+     * Removes the board of Pixels from memory.
+     */
+    public void deleteBoard() {
+        mBoard = null;
+    }
+
+    /**
      * Stores a new Pixel object at the given coordinate in the board data.
      * @param x the x-coordinate for the Pixel to write to.
      * @param y the y-coordinate for the Pixel to write to.
