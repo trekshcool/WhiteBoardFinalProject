@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/item_black"
+        android:icon="@drawable/black_brush"
+        android:title="@string/item_black_name" />
+
+    <item
+        android:id="@+id/item_red"
+        android:icon="@drawable/red_brush"
+        android:title="@string/item_red_name" />
+
+    <item
+        android:id="@+id/item_orange"
+        android:icon="@drawable/orange_brush"
+        android:title="@string/item_orange_name" />
+    <item
+        android:id="@+id/item_yellow"
+        android:icon="@drawable/yellow_brush"
+        android:title="@string/item_yellow_name" />
+    <item
+        android:id="@+id/item_green"
+        android:icon="@drawable/green_brush"
+        android:title="@string/item_green_name" />
+
+    <item
+        android:id="@+id/item_blue"
+        android:icon="@drawable/blue_brush"
+        android:title="@string/item_blue_name" />
+
+    <item
+        android:id="@+id/item_purple"
+        android:icon="@drawable/purple_brush"
+        android:title="@string/item_purple_name" />
+
+    <item
+        android:id="@+id/item_pink"
+        android:icon="@drawable/pink_brush"
+        android:title="@string/item_pink_name" />
+
+    <item
+        android:id="@+id/item_brown"
+        android:icon="@drawable/brown_brush"
+        android:title="@string/item_brown_name" />
+</menu>

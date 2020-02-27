@@ -7,4 +7,13 @@
     <string name="default_dist_text">Distance: Unavailable</string>
     <string name="dist_text_available">Available!</string>
     <string name="text_board_name_default">Whiteboard</string>
+    <string name="item_black_name">Black</string>
+    <string name="item_red_name">Red</string>
+    <string name="item_orange_name">Orange</string>
+    <string name="item_yellow_name">Yellow</string>
+    <string name="item_green_name">Green</string>
+    <string name="item_blue_name">Blue</string>
+    <string name="item_purple_name">Purple</string>
+    <string name="item_pink_name">Pink</string>
+    <string name="item_brown_name">Brown</string>
 </resources>

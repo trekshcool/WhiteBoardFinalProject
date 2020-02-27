@@ -271,7 +271,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d(TAG, "Updating Whiteboards");
 
         // Loop through Whiteboards in whiteboardList
-        for (Whiteboard whiteboard: whiteboardList){
+        for (Whiteboard whiteboard : whiteboardList){
             Log.d(TAG, "Update Whiteboard: " + whiteboard.getName());
             whiteboard.updateDistance(curLoc.getLatitude(), curLoc.getLongitude());
         }
