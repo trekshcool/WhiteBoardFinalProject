@@ -120,35 +120,34 @@ public class PaintingActivity extends AppCompatActivity {
                 updatePixelGUI(pixelId, newPixel.getColor());
 
                 // UpdatePaint
-                updatePaintLevel(whiteboard.MAX_INK, whiteboard.getInkLevel());
+                updatePaintLevel(whiteboard.getInkLevel());
             }
         }
 
         /**
          * change icon based on whitboard ink level percentage
-         * @param maxInk double the amout of ink each user is aloted
          * @param inkLevel double the current amout the user has left
          */
-        private void updatePaintLevel(double maxInk, double inkLevel) {
+        private void updatePaintLevel(double inkLevel) {
             ImageView inkMeeter = (ImageView) findViewById(R.id.InkMeeter);
 
             //Full bottle
-            if(inkLevel == maxInk){
+            if(inkLevel == (double) Whiteboard.MAX_INK){
                 inkMeeter.setImageResource(R.drawable.ink_bottle_4);
             }
 
             //25% or less
-            else if ((inkLevel / maxInk) <= 0.25){
+            else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.25){
                 inkMeeter.setImageResource(R.drawable.ink_bottle_1);
             }
 
             //50% or less
-            else if ((inkLevel / maxInk) <= 0.50){
+            else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.50){
                 inkMeeter.setImageResource(R.drawable.ink_bottle_2);
             }
 
             //75% or less
-            else if ((inkLevel / maxInk) <= 0.75){
+            else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.75){
                 inkMeeter.setImageResource(R.drawable.ink_bottle_3);
             }
 
