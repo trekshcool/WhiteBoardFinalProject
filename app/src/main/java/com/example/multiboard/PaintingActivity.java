@@ -13,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -117,7 +118,42 @@ public class PaintingActivity extends AppCompatActivity {
 
                 // Update GUI
                 updatePixelGUI(pixelId, newPixel.getColor());
+
+                // UpdatePaint
+                updatePaintLevel(whiteboard.MAX_INK, whiteboard.getInkLevel());
             }
+        }
+
+        /**
+         * change icon based on whitboard ink level percentage
+         * @param maxInk double the amout of ink each user is aloted
+         * @param inkLevel double the current amout the user has left
+         */
+        private void updatePaintLevel(double maxInk, double inkLevel) {
+            ImageView inkMeeter = (ImageView) findViewById(R.id.InkMeeter);
+
+            //Full bottle
+            if(inkLevel == maxInk){
+                inkMeeter.setImageResource(R.drawable.ink_bottle_4);
+            }
+
+            //25% or less
+            else if ((inkLevel / maxInk) <= 0.25){
+                inkMeeter.setImageResource(R.drawable.ink_bottle_1);
+            }
+
+            //50% or less
+            else if ((inkLevel / maxInk) <= 0.50){
+                inkMeeter.setImageResource(R.drawable.ink_bottle_2);
+            }
+
+            //75% or less
+            else if ((inkLevel / maxInk) <= 0.75){
+                inkMeeter.setImageResource(R.drawable.ink_bottle_3);
+            }
+
+            //empty
+            //else if (inkLevel == 0){}
         }
 
         @Override
