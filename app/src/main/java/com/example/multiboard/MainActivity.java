@@ -106,6 +106,47 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
+    ValueEventListener inkLevelListener = new ValueEventListener() {
+        /**
+         * This method is called when the Activity is started and whenever something in the
+         * 'whiteboards' node of the database is modified. This allows the activity to display all
+         * the Whiteboards on the database.
+         * @param dataSnapshot new data.
+         */
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            // Iterate over all modified whiteboards
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                // Get Whiteboard object from database
+                Whiteboard wb = ds.getValue(Whiteboard.class);
+
+                for (DataSnapshot dss : ds.getChildren()){
+                    for ()
+                    whiteboardList.get(whiteboardList.indexOf(dss.))
+                }
+
+                // Add list card
+                View cardView = mInflater.inflate(R.layout.whiteboard_list_card, linearWhiteboards, false);
+                linearWhiteboards.addView(cardView);
+                whiteboardList.add(wb);
+
+                // Fill in information on the new list card
+                try {
+                    wb.setupListCard(getBaseContext(), cardView);
+                } catch (NullPointerException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            // Getting data failed
+            Log.w(TAG, databaseError.toException());
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
