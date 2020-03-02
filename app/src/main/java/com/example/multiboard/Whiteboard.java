@@ -329,4 +329,15 @@ public class Whiteboard implements Comparable<Whiteboard> {
             return deltaDist;
         }
     }
+
+    /**
+     * compare if two whiteboards have same name
+     * @param otherboard other whiteboard name
+     * @return return true if equal, else false.
+     */
+    @Override
+    public boolean equals(Whiteboard otherboard){
+        return this.mName.equals(otherboard.getName());
+    }
+
 }
