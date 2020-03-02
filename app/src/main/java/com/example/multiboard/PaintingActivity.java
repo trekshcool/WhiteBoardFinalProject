@@ -74,7 +74,7 @@ public class PaintingActivity extends AppCompatActivity {
                 Whiteboard dsWhiteboard = ds.getValue(Whiteboard.class);
                 if (dsWhiteboard.getName().equals(whiteboardName)) {
                     whiteboard = dsWhiteboard;
-                    paintView.init(Whiteboard.WIDTH, Whiteboard.HEIGHT);
+                    paintView.init(Whiteboard.WIDTH, Whiteboard.HEIGHT, whiteboard);
                 }
             }
         }
