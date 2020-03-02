@@ -46,7 +46,6 @@ public class PaintingActivity extends AppCompatActivity {
     private int BROWN = 0xFF6C4F30;
 
     // GUI Views
-    private boolean isPixelGUISetup = false;
     private TextView textBoardName;
     private PaintView paintView;
     private ImageButton buttonPopup;
@@ -75,7 +74,6 @@ public class PaintingActivity extends AppCompatActivity {
                 Whiteboard dsWhiteboard = ds.getValue(Whiteboard.class);
                 if (dsWhiteboard.getName().equals(whiteboardName)) {
                     whiteboard = dsWhiteboard;
-                    whiteboard.initBoard();
                     paintView.init(Whiteboard.WIDTH, Whiteboard.HEIGHT);
                 }
             }
@@ -210,25 +208,6 @@ public class PaintingActivity extends AppCompatActivity {
                 .addValueEventListener(userListener);
     }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        whiteboard.deleteBoard();
-    }
-
-    void colorDatabasePixel(int x, int y, int color) {
-        // Create new Pixel object
-        Pixel pixel = new Pixel(mUserId, color);
-
-        // Upload new Pixel object to database
-        int pixelId = whiteboard.getIdFromXY(x, y);
-        mFirebaseDatabaseReference
-                .child("board-data")
-                .child(whiteboardName)
-                .child(Integer.toString(pixelId))
-                .setValue(pixel);
-    }
-
     /**
      * change icon based on whiteboard ink level percentage
      * @param inkLevel int the current amount the user has left
@@ -261,8 +240,6 @@ public class PaintingActivity extends AppCompatActivity {
         else if (inkPercent <= 0.75){
             inkMeter.setImageResource(R.drawable.ink_bottle_3);
         }
-
-        Log.d(TAG, "" + inkPercent);
     }
 
     /**

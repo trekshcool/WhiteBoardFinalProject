@@ -16,20 +16,24 @@ import java.util.ArrayList;
 
 public class PaintView extends View {
 
+    // Constant brush variables
     public static int DEFAULT_SIZE = 8;
     public static final int DEFAULT_COLOR = Color.BLACK;
     private static final float TOUCH_TOLERANCE = 4;
+
+    // Stroke path variables
     private float mX, mY;
     private Path path;
     private Paint paint;
     private ArrayList<StrokePath> paths = new ArrayList<>();
     private int currentColor;
     private int strokeWidth;
+
+    // PaintView/canvas variables
     private boolean isScaled = false;
     private Bitmap bitmap;
     private Canvas canvas;
     private Paint bitmapPaint = new Paint(Paint.DITHER_FLAG);
-
 
     public PaintView(Context context) {
         this(context, null);
@@ -37,6 +41,8 @@ public class PaintView extends View {
 
     public PaintView(Context context, AttributeSet attrs) {
         super(context, attrs);
+
+        // Setup paint
         paint = new Paint();
         paint.setAntiAlias(false);
         paint.setDither(true);
@@ -164,11 +170,5 @@ public class PaintView extends View {
     public void setStrokeWidth(int width) {
         strokeWidth = width;
         bitmapPaint.setStrokeWidth(width);
-    }
-    public float getStrokeWidth() {
-        return bitmapPaint.getStrokeWidth();
-    }
-    public int getColor() {
-        return bitmapPaint.getColor();
     }
 }
