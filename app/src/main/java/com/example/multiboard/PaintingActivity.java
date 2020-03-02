@@ -149,9 +149,6 @@ public class PaintingActivity extends AppCompatActivity {
                 // Get Pixel object from database and write to the Whiteboard object
                 Pixel newPixel = ds.getValue(Pixel.class);
                 whiteboard.writePixel(x, y, newPixel);
-
-                // Update GUI
-                updatePixelGUI(pixelId, newPixel.getColor());
             }
         }
 
@@ -252,16 +249,6 @@ public class PaintingActivity extends AppCompatActivity {
                 .child("board-data")
                 .child(whiteboardName)
                 .addValueEventListener(pixelListener);
-
-//        ImageButton popb = (ImageButton) findViewById(R.id.paintMenu);
-//
-//        popb.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View view) {
-//                startActivity(new Intent(PaintingActivity.this, popupPaint.class));
-//            }
-//        });
     }
 
     @Override
@@ -271,9 +258,8 @@ public class PaintingActivity extends AppCompatActivity {
     }
 
     private void colorPixel(int x, int y, int color) {
-        // Write to local Whiteboard object
+        // Create new Pixel object
         Pixel pixel = new Pixel(mUserId, color);
-        whiteboard.writePixel(x, y, pixel);
 
         // Upload new Pixel object to database
         int pixelId = whiteboard.getIdFromXY(x, y);
@@ -282,9 +268,6 @@ public class PaintingActivity extends AppCompatActivity {
                 .child(whiteboardName)
                 .child(Integer.toString(pixelId))
                 .setValue(pixel);
-
-        // Update GUI
-        updatePixelGUI(pixelId, color);
     }
 
     /**
@@ -323,25 +306,6 @@ public class PaintingActivity extends AppCompatActivity {
         Log.d(TAG, "" + inkPercent);
     }
 
-    private void updatePixelGUI(int pixelId, int newColor) {
-        // Make sure the GUI board exists
-        if (!isPixelGUISetup) {
-            setupPixelGUI();
-        }
-
-        // TODO: Update the GUI with the new Pixel color
-    }
-
-    /**
-     * Called after the Whiteboard data has been fetched from the database, but before any calls
-     * to updatePixelGUI().
-     */
-    private void setupPixelGUI() {
-        // TODO: Create a bunch of pixel Views in the GUI based on the current whiteboard
-
-        isPixelGUISetup = true;
-    }
-
     /**
      * Extract data from MainActivity's intent.
      */
@@ -378,11 +342,6 @@ public class PaintingActivity extends AppCompatActivity {
      */
     public void openPopupPaint(View view){
         popupPaint.show();
-//        Intent intent = PaintingActivity.makeIntent(
-//                PaintingActivity.this,
-//                paint.getColor,
-//                paint.getStrokeWidth);
-//        startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 
 }
