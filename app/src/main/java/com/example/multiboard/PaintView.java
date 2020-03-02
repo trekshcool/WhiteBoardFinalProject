@@ -51,6 +51,27 @@ public class PaintView extends View {
     private DatabaseReference dbReference;
     private DatabaseReference curPathReference;
 
+    ValueEventListener dataSetupListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+            // If the database does not have stroke data for this whiteboard
+            if (!dataSnapshot.hasChild(whiteboard.getName())) {
+                // Create an empty StrokePath to get it started
+                StrokePath emptyPath = new StrokePath(0xFFFFFFFF, 0);
+                emptyPath.addPathPoint(0, 0);
+                emptyPath.addPathPoint(1, 1);
+                dbReference
+                        .child("stroke-data")
+                        .child(whiteboard.getName())
+                        .push()
+                        .setValue(emptyPath);
+            }
+        }
+
+        @Override
+        public void onCancelled(DatabaseError error) {}
+    };
+
     ValueEventListener pathListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -59,13 +80,23 @@ public class PaintView extends View {
 
             // Iterate over all children of the node
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                // Ignore if ds is current path
+                if (curPathReference != null && curPathReference.getKey().equals(ds.getKey())) {
+                    continue;
+                }
+
                 // Get the data as a StrokePath and add it to the drawing list
                 StrokePath sp = ds.getValue(StrokePath.class);
                 paths.add(sp);
             }
 
-            // Add current path to list of paths to draw
-            paths.add(strokePath);
+            // If drawing, add current path to list of paths to draw
+            if (strokePath != null) {
+                paths.add(strokePath);
+            }
+
+            // Invalidate canvas to redraw
+            invalidate();
         }
 
         @Override
@@ -118,10 +149,15 @@ public class PaintView extends View {
         // Whiteboard and database setup
         this.whiteboard = whiteboard;
         dbReference = FirebaseDatabase.getInstance().getReference();
-//        dbReference
-//                .child("stroke-data")
-//                .child(whiteboard.getName())
-//                .addValueEventListener(pathListener);
+
+        // Add child for this Whiteboard if none exists
+        dbReference
+                .child("stroke-data")
+                .addListenerForSingleValueEvent(dataSetupListener);
+        dbReference
+                .child("stroke-data")
+                .child(whiteboard.getName())
+                .addValueEventListener(pathListener);
     }
 
     /**
@@ -213,14 +249,14 @@ public class PaintView extends View {
     }
 
     /**
-     * Called when a finger first lifts up off the screen. Ends the drawing path with a final line
+     * Called when a finger lifts up off the screen. Ends the drawing path with a final line
      * to the last known finger location.
      */
     private void touchUp() {
-        //path.lineTo(mX, mY);
-
         // Update StrokePath data
         curPathReference.setValue(strokePath);
+        strokePath = null;
+        curPathReference = null;
     }
 
     /**
