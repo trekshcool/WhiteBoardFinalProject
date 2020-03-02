@@ -3,12 +3,18 @@ package com.example.multiboard;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.location.Location;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.Comparator;
 import java.util.Locale;
@@ -20,8 +26,9 @@ import java.util.Locale;
 public class Whiteboard implements Comparable<Whiteboard> {
 
     // Constants
-    private final static int WIDTH = 5000;
-    private final static int HEIGHT = 5000;
+    private final static String TAG = "Whiteboard";
+    final static int WIDTH = 1400;
+    final static int HEIGHT = 2000;
     public final static int MAX_INK = 150;
 
     // Whiteboard variables
@@ -65,7 +72,8 @@ public class Whiteboard implements Comparable<Whiteboard> {
     /**
      * Initialize a blank board of new Pixels.
      */
-    private void initBoard() {
+    public void initBoard() {
+        mBoard = new Pixel[WIDTH][HEIGHT];
         for (int i = 0; i < WIDTH; i++) {
             for (int j = 0; j < HEIGHT; j++) {
                 mBoard[i][j] = new Pixel();
@@ -74,10 +82,21 @@ public class Whiteboard implements Comparable<Whiteboard> {
     }
 
     /**
-     * Load in and start listening for Pixel data from the database's board-data node.
+     * Removes the board of Pixels from memory.
      */
-    private void loadBoard() {
-        // TODO: Get pixel data from database and write to board
+    public void deleteBoard() {
+        mBoard = null;
+    }
+
+    /**
+     * Stores a new Pixel object at the given coordinate in the board data.
+     * @param x the x-coordinate for the Pixel to write to.
+     * @param y the y-coordinate for the Pixel to write to.
+     * @param newPixel the new Pixel object to store here.
+     */
+    public void writePixel(int x, int y, Pixel newPixel) {
+        // Write new Pixel object
+        mBoard[x][y] = newPixel;
     }
 
     /**
@@ -96,6 +115,46 @@ public class Whiteboard implements Comparable<Whiteboard> {
 
         distText = view.findViewById(R.id.text_dist);
         distText.setText(R.string.default_dist_text);
+    }
+
+    /**
+     * Calculate the x-coordinate for the given pixelId.
+     * @param pixelId ID of the Pixel.
+     * @return the x-coordinate of the Pixel. -1 if invalid ID.
+     */
+    public int getXFromId(int pixelId) {
+        if (0 <= pixelId && pixelId < WIDTH * HEIGHT) {
+            return pixelId % WIDTH;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Calculate the y-coordinate for the given pixelId.
+     * @param pixelId ID of the Pixel.
+     * @return the y-coordinate of the Pixel. -1 if invalid ID.
+     */
+    public int getYFromId(int pixelId) {
+        if (0 <= pixelId && pixelId < WIDTH * HEIGHT) {
+            return pixelId / WIDTH;
+        } else {
+            return -1;
+        }
+    }
+
+    /**
+     * Calculate the ID for the given Pixel coordinates.
+     * @param x x-coordinate of the Pixel.
+     * @param x y-coordinate of the Pixel.
+     * @return the ID of the Pixel.
+     */
+    public int getIdFromXY(int x, int y) {
+        if (0 <= x && x < WIDTH && 0 <= y && y < HEIGHT) {
+            return y * WIDTH + x;
+        } else {
+            return -1;
+        }
     }
 
     /**
@@ -142,38 +201,69 @@ public class Whiteboard implements Comparable<Whiteboard> {
         active = false;
     }
 
+    /**
+     * @return Whiteboard name
+     */
     public String getName() {
         return mName;
     }
 
+    /**
+     * set Whiteboard name
+     * @param name
+     */
     public void setName(String name) {
         mName = name;
     }
 
+    /**
+     * @return whiteboeard Latitude
+     */
     public double getLatitude() {
         return mLatitude;
     }
 
+    /**
+     * set whiteboeard Latitude location
+     * @param mLatitude
+     */
     public void setLatitude(double mLatitude) {
         this.mLatitude = mLatitude;
     }
 
+    /**
+     * @return whiteboeard Latitude
+     */
     public double getLongitude() {
         return mLongitude;
     }
 
+    /**
+     * set whiteboeard Longitude location
+     * @param mLongitude
+     */
     public void setLongitude(double mLongitude) {
         this.mLongitude = mLongitude;
     }
 
+    /**
+     * @return Radius area from whiteboeard center in meters
+     */
     public double getRadius() {
         return mRadius;
     }
 
+    /**
+     * set Radius area from whiteboeard center
+     * @param mRadius in meters
+     */
     public void setRadius(double mRadius) {
         this.mRadius = mRadius;
     }
 
+    /**
+     * @return return amount of ink user has left
+     */
     int getInkLevel() {
         return mInkLevel;
     }
