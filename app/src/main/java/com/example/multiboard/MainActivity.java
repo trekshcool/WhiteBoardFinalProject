@@ -95,11 +95,16 @@ public class MainActivity extends AppCompatActivity {
 
                 // Fill in information on the new list card
                 try {
-                    wb.setupListCard(getBaseContext(), cardView);
+                    wb.setupListCard(cardView);
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
             }
+
+            // Listen for user ink levels
+            mFirebaseDatabaseReference
+                    .child("users")
+                    .addValueEventListener(userListener);
         }
 
         @Override
@@ -136,6 +141,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Set whiteboard ink data from database
             for (DataSnapshot dataWB : dataUser.getChildren()) {
+                Log.d(TAG, dataWB.getKey());
                 // Get Whiteboard object
                 Whiteboard whiteboard = getWhiteboardByName(dataWB.getKey());
 
@@ -145,9 +151,8 @@ public class MainActivity extends AppCompatActivity {
                     whiteboard.setInkLevel(ink);
                 }
 
-                // Display new ink2 level
-                // TODO: updatePaintLevels
-                //updatePaintLevels(whiteboard.getInkLevel());
+                // Display new ink level
+                whiteboard.updateInkLevel();
             }
         }
 
@@ -174,6 +179,9 @@ public class MainActivity extends AppCompatActivity {
         linearWhiteboards = findViewById(R.id.linear_whiteboards);
         mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        // Whiteboards
+        whiteboardList = new ArrayList<>();
+
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
@@ -198,11 +206,6 @@ public class MainActivity extends AppCompatActivity {
         mFirebaseDatabaseReference
                 .child("whiteboards")
                 .addValueEventListener(whiteboardListener);
-
-        // Listen for user ink level changes
-        mFirebaseDatabaseReference
-                .child("users")
-                .addValueEventListener(userListener);
 
         // Create callback function for realtime location results
         locationCallback = new LocationCallback() {

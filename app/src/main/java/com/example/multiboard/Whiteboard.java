@@ -19,14 +19,14 @@ public class Whiteboard implements Comparable<Whiteboard> {
     private final static String TAG = "Whiteboard";
     final static int WIDTH = 1400;
     final static int HEIGHT = 2000;
-    public final static int MAX_INK = 150;
+    public final static float MAX_INK = 150;
 
     // Whiteboard variables
     private String mName; // Unique name representing this Whiteboard
     private double mLatitude; // Coordinates for the centroid
     private double mLongitude;
     private double mRadius; // Radius of geofence circle
-    private int mInkLevel;
+    private float mInkLevel;
     private boolean active = false; // Whether the Whiteboard is in range or not
     private double distFromUser = Double.MAX_VALUE;
 
@@ -60,18 +60,14 @@ public class Whiteboard implements Comparable<Whiteboard> {
 
     /**
      * Prints all the necessary data to a given Whiteboard list card.
-     * @param context the current context (for resource access).
      * @param view the ViewGroup corresponding to the Whiteboard's list card.
      */
-    public void setupListCard(Context context, View view) {
+    public void setupListCard(View view) {
         // Set Whiteboard text views
         mCardView = (CardView) view;
         ((TextView) view.findViewById(R.id.text_name)).setText(getName());
 
-        int inkLevel = getInkLevel() * 100 / Whiteboard.MAX_INK;
-        String inkMessage = context.getString(R.string.text_card_ink_level) + " " + inkLevel + "%";
-        ((TextView) view.findViewById(R.id.text_ink_level)).setText(inkMessage);
-
+        updateInkLevel();
         distText = view.findViewById(R.id.text_dist);
         distText.setText(R.string.default_dist_text);
     }
@@ -90,10 +86,19 @@ public class Whiteboard implements Comparable<Whiteboard> {
             distText.setText(R.string.dist_text_available);
             activate();
         } else {
-            String text = String.format(Locale.ENGLISH, "Distance: %.0f meters", distFromUser);
+            String text = distText.getContext().getString(R.string.text_card_dist, distFromUser);
             distText.setText(text);
             deactivate();
         }
+    }
+
+    /**
+     * Updates the current ink level displays for the Whiteboard.
+     */
+    public void updateInkLevel() {
+        String inkMessage = mCardView.getContext().getString(R.string.text_card_ink_level,
+                getInkPercent() * 100);
+        ((TextView) mCardView.findViewById(R.id.text_ink_level)).setText(inkMessage);
     }
 
     /**
@@ -183,7 +188,7 @@ public class Whiteboard implements Comparable<Whiteboard> {
     /**
      * @return amount of ink user has left.
      */
-    int getInkLevel() {
+    float getInkLevel() {
         return mInkLevel;
     }
 
@@ -191,7 +196,7 @@ public class Whiteboard implements Comparable<Whiteboard> {
      * Set the user's ink level.
      * @param inkLevel new ink remaining.
      */
-    void setInkLevel(int inkLevel) {
+    void setInkLevel(float inkLevel) {
         mInkLevel = inkLevel;
     }
 
@@ -268,5 +273,45 @@ public class Whiteboard implements Comparable<Whiteboard> {
     public boolean equals(Object otherObj) {
         Whiteboard otherBoard = (Whiteboard) otherObj;
         return this.mName.equals(otherBoard.getName());
+    }
+
+    /**
+     * @return the ink level as a percentage of the maximum ink.
+     */
+    private float getInkPercent() {
+        return mInkLevel / Whiteboard.MAX_INK;
+    }
+
+    /**
+     * Return icon associated with the given ink level.
+     * @return resource id of the associated drawable.
+     */
+    private int getInkDrawable() {
+        double inkPercent = getInkPercent();
+
+        // Empty
+        if (inkPercent <= 0.0){
+            return R.drawable.ink_bottle_0;
+        }
+
+        // 25% or less
+        else if (inkPercent <= 0.25){
+            return R.drawable.ink_bottle_1;
+        }
+
+        // 50% or less
+        else if (inkPercent <= 0.50){
+            return R.drawable.ink_bottle_2;
+        }
+
+        // 75% or less
+        else if (inkPercent <= 0.75){
+            return R.drawable.ink_bottle_3;
+        }
+
+        // Full bottle
+        else {
+            return R.drawable.ink_bottle_4;
+        }
     }
 }

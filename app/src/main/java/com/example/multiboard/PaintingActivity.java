@@ -168,40 +168,6 @@ public class PaintingActivity extends AppCompatActivity {
     }
 
     /**
-     * change icon based on whiteboard ink level percentage
-     * @param inkLevel int the current amount the user has left
-     */
-    private void updatePaintLevel(int inkLevel) {
-        ImageView inkMeter = findViewById(R.id.img_ink_meter);
-        double inkPercent = inkLevel / (double) Whiteboard.MAX_INK;
-
-        // Full bottle
-        if (inkPercent >= 1.0){
-            inkMeter.setImageResource(R.drawable.ink_bottle_4);
-        }
-
-        // Empty
-        else if (inkPercent <= 0.0){
-            inkMeter.setImageResource(R.drawable.ink_bottle_0);
-        }
-
-        // 25% or less
-        else if (inkPercent <= 0.25){
-            inkMeter.setImageResource(R.drawable.ink_bottle_1);
-        }
-
-        // 50% or less
-        else if (inkPercent <= 0.50){
-            inkMeter.setImageResource(R.drawable.ink_bottle_2);
-        }
-
-        // 75% or less
-        else if (inkPercent <= 0.75){
-            inkMeter.setImageResource(R.drawable.ink_bottle_3);
-        }
-    }
-
-    /**
      * Extract data from MainActivity's intent.
      */
     private void extractDataFromIntent() {

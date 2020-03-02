@@ -2,8 +2,8 @@
     <string name="app_name">Multiboard</string>
     <string name="text_sign_in">Sign in with Google to start using Multiboard!</string>
     <string name="text_card_name">Whiteboard Name</string>
-    <string name="text_card_dist">Distance:</string>
-    <string name="text_card_ink_level">Ink level:</string>
+    <string name="text_card_dist">Distance: %.0f meters</string>
+    <string name="text_card_ink_level">Ink level: %.1f%%</string>
     <string name="default_dist_text">Distance: Unavailable</string>
     <string name="dist_text_available">Available!</string>
     <string name="text_board_name_default">Whiteboard</string>
