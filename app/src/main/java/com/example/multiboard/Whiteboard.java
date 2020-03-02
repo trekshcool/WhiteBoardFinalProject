@@ -1,27 +1,17 @@
 package com.example.multiboard;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
-import android.location.Location;
-import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
-
-import java.util.Comparator;
 import java.util.Locale;
 
 /**
- * Represents an individual Whiteboard, storing pixels for painting and rendering and GPS
- * information for checking user coordinates.
+ * Represents an individual Whiteboard, storing user information and
+ * GPS information for checking user coordinates.
  */
 public class Whiteboard implements Comparable<Whiteboard> {
 
@@ -33,7 +23,6 @@ public class Whiteboard implements Comparable<Whiteboard> {
 
     // Whiteboard variables
     private String mName; // Unique name representing this Whiteboard
-    private Pixel[][] mBoard; // The board data itself
     private double mLatitude; // Coordinates for the centroid
     private double mLongitude;
     private double mRadius; // Radius of geofence circle
@@ -70,36 +59,6 @@ public class Whiteboard implements Comparable<Whiteboard> {
     }
 
     /**
-     * Initialize a blank board of new Pixels.
-     */
-    public void initBoard() {
-        mBoard = new Pixel[WIDTH][HEIGHT];
-        for (int i = 0; i < WIDTH; i++) {
-            for (int j = 0; j < HEIGHT; j++) {
-                mBoard[i][j] = new Pixel();
-            }
-        }
-    }
-
-    /**
-     * Removes the board of Pixels from memory.
-     */
-    public void deleteBoard() {
-        mBoard = null;
-    }
-
-    /**
-     * Stores a new Pixel object at the given coordinate in the board data.
-     * @param x the x-coordinate for the Pixel to write to.
-     * @param y the y-coordinate for the Pixel to write to.
-     * @param newPixel the new Pixel object to store here.
-     */
-    public void writePixel(int x, int y, Pixel newPixel) {
-        // Write new Pixel object
-        mBoard[x][y] = newPixel;
-    }
-
-    /**
      * Prints all the necessary data to a given Whiteboard list card.
      * @param context the current context (for resource access).
      * @param view the ViewGroup corresponding to the Whiteboard's list card.
@@ -115,46 +74,6 @@ public class Whiteboard implements Comparable<Whiteboard> {
 
         distText = view.findViewById(R.id.text_dist);
         distText.setText(R.string.default_dist_text);
-    }
-
-    /**
-     * Calculate the x-coordinate for the given pixelId.
-     * @param pixelId ID of the Pixel.
-     * @return the x-coordinate of the Pixel. -1 if invalid ID.
-     */
-    public int getXFromId(int pixelId) {
-        if (0 <= pixelId && pixelId < WIDTH * HEIGHT) {
-            return pixelId % WIDTH;
-        } else {
-            return -1;
-        }
-    }
-
-    /**
-     * Calculate the y-coordinate for the given pixelId.
-     * @param pixelId ID of the Pixel.
-     * @return the y-coordinate of the Pixel. -1 if invalid ID.
-     */
-    public int getYFromId(int pixelId) {
-        if (0 <= pixelId && pixelId < WIDTH * HEIGHT) {
-            return pixelId / WIDTH;
-        } else {
-            return -1;
-        }
-    }
-
-    /**
-     * Calculate the ID for the given Pixel coordinates.
-     * @param x x-coordinate of the Pixel.
-     * @param x y-coordinate of the Pixel.
-     * @return the ID of the Pixel.
-     */
-    public int getIdFromXY(int x, int y) {
-        if (0 <= x && x < WIDTH && 0 <= y && y < HEIGHT) {
-            return y * WIDTH + x;
-        } else {
-            return -1;
-        }
     }
 
     /**
@@ -274,25 +193,6 @@ public class Whiteboard implements Comparable<Whiteboard> {
      */
     void setInkLevel(int inkLevel) {
         mInkLevel = inkLevel;
-    }
-
-    /**
-     * Get the pixel at the given coordinates.
-     * @param x the x-coordinate.
-     * @param y the y-coordinate.
-     * @return the Pixel object at these coordinates.
-     */
-    Pixel getPixel(int x, int y) {
-        return mBoard[x][y];
-    }
-
-    /**
-     * Get the pixel with the given ID.
-     * @param id the ID of the Pixel.
-     * @return the Pixel object at these coordinates.
-     */
-    Pixel getPixel(int id) {
-        return getPixel(getXFromId(id), getYFromId(id));
     }
 
     /**
