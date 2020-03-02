@@ -202,14 +202,14 @@ public class Whiteboard implements Comparable<Whiteboard> {
     }
 
     /**
-     * @return Whiteboard name
+     * @return Whiteboard name.
      */
     public String getName() {
         return mName;
     }
 
     /**
-     * set Whiteboard name
+     * Set Whiteboard name.
      * @param name
      */
     public void setName(String name) {
@@ -217,14 +217,14 @@ public class Whiteboard implements Comparable<Whiteboard> {
     }
 
     /**
-     * @return whiteboeard Latitude
+     * @return Whiteboeard latitude.
      */
     public double getLatitude() {
         return mLatitude;
     }
 
     /**
-     * set whiteboeard Latitude location
+     * Set Whiteboard latitude location.
      * @param mLatitude
      */
     public void setLatitude(double mLatitude) {
@@ -232,14 +232,14 @@ public class Whiteboard implements Comparable<Whiteboard> {
     }
 
     /**
-     * @return whiteboeard Latitude
+     * @return Whiteboard latitude.
      */
     public double getLongitude() {
         return mLongitude;
     }
 
     /**
-     * set whiteboeard Longitude location
+     * Set Whiteboard longitude location.
      * @param mLongitude
      */
     public void setLongitude(double mLongitude) {
@@ -247,14 +247,14 @@ public class Whiteboard implements Comparable<Whiteboard> {
     }
 
     /**
-     * @return Radius area from whiteboeard center in meters
+     * @return radius from Whiteboard center in meters.
      */
     public double getRadius() {
         return mRadius;
     }
 
     /**
-     * set Radius area from whiteboeard center
+     * Set radius from Whiteboard center.
      * @param mRadius in meters
      */
     public void setRadius(double mRadius) {
@@ -262,20 +262,49 @@ public class Whiteboard implements Comparable<Whiteboard> {
     }
 
     /**
-     * @return return amount of ink user has left
+     * @return amount of ink user has left.
      */
     int getInkLevel() {
         return mInkLevel;
     }
 
+    /**
+     * Set the user's ink level.
+     * @param inkLevel new ink remaining.
+     */
     void setInkLevel(int inkLevel) {
         mInkLevel = inkLevel;
     }
 
+    /**
+     * Get the pixel at the given coordinates.
+     * @param x the x-coordinate.
+     * @param y the y-coordinate.
+     * @return the Pixel object at these coordinates.
+     */
+    Pixel getPixel(int x, int y) {
+        return mBoard[x][y];
+    }
+
+    /**
+     * Get the pixel with the given ID.
+     * @param id the ID of the Pixel.
+     * @return the Pixel object at these coordinates.
+     */
+    Pixel getPixel(int id) {
+        return getPixel(getXFromId(id), getYFromId(id));
+    }
+
+    /**
+     * @return true if the board is within range (activated), false otherwise.
+     */
     boolean isActive() {
         return active;
     }
 
+    /**
+     * @return the CardView associated with this Whiteboard.
+     */
     CardView getCardView() {
         return mCardView;
     }

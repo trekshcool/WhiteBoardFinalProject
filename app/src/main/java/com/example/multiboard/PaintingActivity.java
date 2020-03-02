@@ -124,41 +124,6 @@ public class PaintingActivity extends AppCompatActivity {
         }
     };
 
-    // Callback for Firebase Pixel updates
-    ValueEventListener pixelListener = new ValueEventListener() {
-        /**
-         * This method is called when the board data is loaded and whenever a Pixel in the
-         * 'board-data/BOARD_NAME' node of the database is modified. This allows the activity to
-         * get realtime updates to the board's Pixels.
-         * @param dataSnapshot new data.
-         */
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            // Iterate over all modified Pixels
-            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                if (ds.getKey() == null) {
-                    Log.e(TAG, "DataSnapshot key is null");
-                    continue;
-                }
-
-                // Get pixel coordinates
-                int pixelId = Integer.parseInt(ds.getKey());
-                int x = whiteboard.getXFromId(pixelId);
-                int y = whiteboard.getYFromId(pixelId);
-
-                // Get Pixel object from database and write to the Whiteboard object
-                Pixel newPixel = ds.getValue(Pixel.class);
-                whiteboard.writePixel(x, y, newPixel);
-            }
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-            // Getting data failed
-            Log.w(TAG, databaseError.toException());
-        }
-    };
-
     // Popup menu callback
     MenuBuilder.Callback popupListener = new MenuBuilder.Callback() {
         /**
@@ -232,7 +197,7 @@ public class PaintingActivity extends AppCompatActivity {
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
-        // Get Whiteboard data from Firebase
+        // Get Whiteboard data from Firebase and start listening for updates
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseDatabaseReference
                 .child("whiteboards")
@@ -243,12 +208,6 @@ public class PaintingActivity extends AppCompatActivity {
                 .child("users")
                 .child(mUserId)
                 .addValueEventListener(userListener);
-
-        // Get Whiteboard Pixel data and start listening for Pixel updates
-        mFirebaseDatabaseReference
-                .child("board-data")
-                .child(whiteboardName)
-                .addValueEventListener(pixelListener);
     }
 
     @Override
@@ -257,7 +216,7 @@ public class PaintingActivity extends AppCompatActivity {
         whiteboard.deleteBoard();
     }
 
-    private void colorPixel(int x, int y, int color) {
+    void colorDatabasePixel(int x, int y, int color) {
         // Create new Pixel object
         Pixel pixel = new Pixel(mUserId, color);
 
