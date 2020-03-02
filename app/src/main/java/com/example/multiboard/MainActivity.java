@@ -352,30 +352,8 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = PaintingActivity.makeIntent(
                 MainActivity.this,
                 whiteboard.getName(),
-                mUserId);
+                whiteboard.getInkLevel());
         startActivityForResult(intent, REQUEST_CODE_PAINT);
-    }
-
-    //Return infomation on return
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v(TAG, "get from PaintingActivity");
-
-        switch (requestCode){
-            case REQUEST_CODE_PAINT: {
-                Log.v(TAG, "request code corect");
-                if (resultCode == Activity.RESULT_OK) {
-                    Log.v(TAG, "Activity ok");
-                    //Log.v(TAG, data.getStringExtra("count"));
-                } else { // if fails
-                    Log.v(TAG, "Activity canciled");
-                }
-                break;
-            }
-            //if request is wrong
-            default:  Log.v(TAG, "request code wrong");
-                break;
-        }
     }
 
     /**

@@ -1,13 +1,12 @@
 package com.example.multiboard;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-
-import java.util.Locale;
 
 /**
  * Represents an individual Whiteboard, storing user information and
@@ -19,7 +18,7 @@ public class Whiteboard implements Comparable<Whiteboard> {
     private final static String TAG = "Whiteboard";
     final static int WIDTH = 1400;
     final static int HEIGHT = 2000;
-    public final static float MAX_INK = 150;
+    public final static float MAX_INK = 20000f;
 
     // Whiteboard variables
     private String mName; // Unique name representing this Whiteboard
@@ -286,8 +285,9 @@ public class Whiteboard implements Comparable<Whiteboard> {
      * Return icon associated with the given ink level.
      * @return resource id of the associated drawable.
      */
-    private int getInkDrawable() {
+    int getInkDrawable() {
         double inkPercent = getInkPercent();
+        Log.d(TAG, inkPercent + "");
 
         // Empty
         if (inkPercent <= 0.0){
