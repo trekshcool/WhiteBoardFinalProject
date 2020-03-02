@@ -146,7 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 Whiteboard whiteboard = getWhiteboardByName(dataWB.getKey());
 
                 // Get ink level for this whiteboard
-                Integer ink = dataWB.getValue(Integer.class);
+                Float ink = dataWB.getValue(Float.class);
                 if (ink != null) {
                     whiteboard.setInkLevel(ink);
                 }
@@ -244,6 +244,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Begin realtime update listening
         startLocationUpdates();
+
+        // Start the InkRefiller
+        InkRefiller.getInstance().startRefilling(mUserId);
     }
 
     @Override

@@ -219,12 +219,9 @@ public class PaintView extends View {
         canvas.restore();
     }
 
-    private void updateInk() {
+    void updateInk() {
         // Set the image based on the ink level
         imageInk.setImageResource(whiteboard.getInkDrawable());
-
-        // Send ink level to database
-
 
         // Stop drawing if depleted
         if (whiteboard.getInkLevel() <= 0f) {
