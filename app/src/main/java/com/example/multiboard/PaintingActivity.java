@@ -7,6 +7,7 @@ import androidx.appcompat.view.menu.MenuPopupHelper;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuInflater;
@@ -26,8 +27,6 @@ import com.google.firebase.database.ValueEventListener;
 
 public class PaintingActivity extends AppCompatActivity {
 
-//    public static final int REQUEST_CODE_PAINT = 4345;
-
     // Debugging
     private static final String TAG = "PaintingActivity";
 
@@ -36,7 +35,7 @@ public class PaintingActivity extends AppCompatActivity {
     private String whiteboardName;
 
     // Paint colors
-    private int BLACK = 0xFF000000;
+    private int BLACK = Color.BLACK;
     private int RED = 0xFFA61A1A;
     private int ORANGE = 0xFFD9971E;
     private int YELLOW = 0xFFD3D91E;

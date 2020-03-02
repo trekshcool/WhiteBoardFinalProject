@@ -17,7 +17,7 @@ import java.util.ArrayList;
 public class PaintView extends View {
 
     public static int DEFAULT_SIZE = 8;
-    public static final int DEFAULT_COLOR = Color.RED;
+    public static final int DEFAULT_COLOR = Color.BLACK;
     private static final float TOUCH_TOLERANCE = 4;
     private float mX, mY;
     private Path path;
