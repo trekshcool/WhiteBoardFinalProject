@@ -123,37 +123,6 @@ public class PaintingActivity extends AppCompatActivity {
             }
         }
 
-        /**
-         * change icon based on whitboard ink level percentage
-         * @param inkLevel double the current amout the user has left
-         */
-        private void updatePaintLevel(double inkLevel) {
-            ImageView inkMeeter = (ImageView) findViewById(R.id.InkMeeter);
-
-            //Full bottle
-            if(inkLevel == (double) Whiteboard.MAX_INK){
-                inkMeeter.setImageResource(R.drawable.ink_bottle_4);
-            }
-
-            //25% or less
-            else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.25){
-                inkMeeter.setImageResource(R.drawable.ink_bottle_1);
-            }
-
-            //50% or less
-            else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.50){
-                inkMeeter.setImageResource(R.drawable.ink_bottle_2);
-            }
-
-            //75% or less
-            else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.75){
-                inkMeeter.setImageResource(R.drawable.ink_bottle_3);
-            }
-
-            //empty
-            //else if (inkLevel == 0){}
-        }
-
         @Override
         public void onCancelled(@NonNull DatabaseError databaseError) {
             // Getting data failed
@@ -278,6 +247,39 @@ public class PaintingActivity extends AppCompatActivity {
 
         // Update GUI
         updatePixelGUI(pixelId, color);
+    }
+
+    /**
+     * change icon based on whitboard ink level percentage
+     * @param inkLevel double the current amout the user has left
+     */
+    private void updatePaintLevel(double inkLevel) {
+        ImageView inkMeter = findViewById(R.id.img_ink_meter);
+
+        // Full bottle
+        if (inkLevel == (double) Whiteboard.MAX_INK){
+            inkMeter.setImageResource(R.drawable.ink_bottle_4);
+        }
+
+        // 25% or less
+        else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.25){
+            inkMeter.setImageResource(R.drawable.ink_bottle_1);
+        }
+
+        // 50% or less
+        else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.50){
+            inkMeter.setImageResource(R.drawable.ink_bottle_2);
+        }
+
+        // 75% or less
+        else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.75){
+            inkMeter.setImageResource(R.drawable.ink_bottle_3);
+        }
+
+        // empty
+        else {
+            inkMeter.setImageResource(R.drawable.ink_bottle_0);
+        }
     }
 
     private void updatePixelGUI(int pixelId, int newColor) {

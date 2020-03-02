@@ -39,7 +39,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
-        android:id="@+id/InkMeeter"
+        android:id="@+id/img_ink_meter"
         android:layout_width="42dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/paint"
