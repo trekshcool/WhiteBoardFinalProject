@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     // Arraylist of all Whiteboards
     private ArrayList<Whiteboard> whiteboardList;
 
-    // Callbacks for Firebase updates
+    // Callbacks for Firebase Whiteboard data
     ValueEventListener whiteboardListener = new ValueEventListener() {
         /**
          * This method is called when the Activity is started and whenever something in the
@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            // Clear Whiteboard list
+            whiteboardList = new ArrayList<>();
+
             // Iterate over all modified whiteboards
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
                 // Get Whiteboard object from database
@@ -103,6 +106,56 @@ public class MainActivity extends AppCompatActivity {
         public void onCancelled(@NonNull DatabaseError databaseError) {
             // Getting data failed
             Log.w(TAG, databaseError.toException());
+        }
+    };
+
+    // Callback for Firebase user data
+    ValueEventListener userListener = new ValueEventListener() {
+        /**
+         * This method is called when the Activity is started to get ink level information
+         * for the current user.
+         * @param dataSnapshot new data.
+         */
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            // If user has no record for any Whiteboard
+            for (Whiteboard wb : whiteboardList) {
+                if (!dataSnapshot.hasChild(mUserId) ||
+                        !dataSnapshot.child(mUserId).hasChild(wb.getName())) {
+                    // Populate with max ink
+                    mFirebaseDatabaseReference
+                            .child("users")
+                            .child(mUserId)
+                            .child(wb.getName())
+                            .setValue(Whiteboard.MAX_INK);
+                }
+            }
+
+            // Get user data snapshot
+            DataSnapshot dataUser = dataSnapshot.child(mUserId);
+
+            // Set whiteboard ink data from database
+            for (DataSnapshot dataWB : dataUser.getChildren()) {
+                // Get Whiteboard object
+                Whiteboard whiteboard = getWhiteboardByName(dataWB.getKey());
+
+                // Get ink level for this whiteboard
+                Integer ink = dataWB.getValue(Integer.class);
+                if (ink != null) {
+                    whiteboard.setInkLevel(ink);
+                }
+
+                // Display new ink2 level
+                // TODO: updatePaintLevels
+                //updatePaintLevels(whiteboard.getInkLevel());
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            // Getting data failed
+            Log.w(TAG, databaseError.toException());
+            finish();
         }
     };
 
@@ -138,14 +191,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Firebase data
+        // Firebase
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+
+        // Listen for Whiteboard changes
         mFirebaseDatabaseReference
                 .child("whiteboards")
                 .addValueEventListener(whiteboardListener);
 
-        // Whiteboards
-        whiteboardList = new ArrayList<>();
+        // Listen for user ink level changes
+        mFirebaseDatabaseReference
+                .child("users")
+                .addValueEventListener(userListener);
 
         // Create callback function for realtime location results
         locationCallback = new LocationCallback() {
@@ -316,6 +373,20 @@ public class MainActivity extends AppCompatActivity {
             default:  Log.v(TAG, "request code wrong");
                 break;
         }
+    }
+
+    /**
+     * Get the Whiteboard with the given name from the whiteboardList.
+     * @param name the name to search for.
+     * @return the Whiteboard with this name, null if not found.
+     */
+    public Whiteboard getWhiteboardByName(String name) {
+        for (Whiteboard wb : whiteboardList) {
+            if (wb.getName().equals(name)) {
+                return wb;
+            }
+        }
+        return null;
     }
 
 

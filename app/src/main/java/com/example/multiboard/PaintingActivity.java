@@ -87,41 +87,6 @@ public class PaintingActivity extends AppCompatActivity {
         }
     };
 
-    // Callback for Firebase user data
-    ValueEventListener userListener = new ValueEventListener() {
-        /**
-         * This method is called when the Activity is started to get ink level information
-         * for the current user.
-         * @param dataSnapshot new data.
-         */
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            Log.d(TAG, "Got data.");
-            // Iterate over all users
-            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                // Get whiteboard ink data from database
-                String dsWhiteboardName = ds.getKey();
-                if (whiteboardName.equals(dsWhiteboardName)) {
-                    // Store ink level
-                    Integer ink = ds.getValue(Integer.class);
-                    if (ink != null) {
-                        whiteboard.setInkLevel(ink);
-                    }
-                }
-            }
-
-            // Display new ink level
-            updatePaintLevel(whiteboard.getInkLevel());
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-            // Getting data failed
-            Log.w(TAG, databaseError.toException());
-            finish();
-        }
-    };
-
     // Popup menu callback
     MenuBuilder.Callback popupListener = new MenuBuilder.Callback() {
         /**
@@ -200,12 +165,6 @@ public class PaintingActivity extends AppCompatActivity {
         mFirebaseDatabaseReference
                 .child("whiteboards")
                 .addValueEventListener(whiteboardListener);
-
-        // Get user ink data from Firebase
-        mFirebaseDatabaseReference
-                .child("users")
-                .child(mUserId)
-                .addValueEventListener(userListener);
     }
 
     /**

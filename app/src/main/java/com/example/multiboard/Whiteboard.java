@@ -258,4 +258,15 @@ public class Whiteboard implements Comparable<Whiteboard> {
             return deltaDist;
         }
     }
+
+    /**
+     * Compare if two Whiteboards have the same name.
+     * @param otherObj other Whiteboard.
+     * @return return true if equal, else false.
+     */
+    @Override
+    public boolean equals(Object otherObj) {
+        Whiteboard otherBoard = (Whiteboard) otherObj;
+        return this.mName.equals(otherBoard.getName());
+    }
 }
