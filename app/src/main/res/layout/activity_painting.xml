@@ -18,11 +18,15 @@
 
     <ImageButton
         android:id="@+id/button_popup"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
         android:onClick="openPopupPaint"
         app:layout_constraintBottom_toBottomOf="@+id/text_board_name"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/text_board_name"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:drawable/ic_menu_edit" />
 
@@ -40,13 +44,12 @@
 
     <ImageView
         android:id="@+id/img_ink_meter"
-        android:layout_width="42dp"
+        android:layout_width="0dp"
         android:layout_height="0dp"
+        android:visibility="visible"
         app:layout_constraintBottom_toTopOf="@+id/paint"
         app:layout_constraintEnd_toStartOf="@+id/text_board_name"
-        app:layout_constraintHorizontal_bias="0.136"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0"
         app:srcCompat="@drawable/ink_bottle_4" />
 </androidx.constraintlayout.widget.ConstraintLayout>

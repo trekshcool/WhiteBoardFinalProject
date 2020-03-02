@@ -89,6 +89,41 @@ public class PaintingActivity extends AppCompatActivity {
         }
     };
 
+    // Callback for Firebase user data
+    ValueEventListener userListener = new ValueEventListener() {
+        /**
+         * This method is called when the Activity is started to get ink level information
+         * for the current user.
+         * @param dataSnapshot new data.
+         */
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            Log.d(TAG, "Got data.");
+            // Iterate over all users
+            for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                // Get whiteboard ink data from database
+                String dsWhiteboardName = ds.getKey();
+                if (whiteboardName.equals(dsWhiteboardName)) {
+                    // Store ink level
+                    Integer ink = ds.getValue(Integer.class);
+                    if (ink != null) {
+                        whiteboard.setInkLevel(ink);
+                    }
+                }
+            }
+
+            // Display new ink level
+            updatePaintLevel(whiteboard.getInkLevel());
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            // Getting data failed
+            Log.w(TAG, databaseError.toException());
+            finish();
+        }
+    };
+
     // Callback for Firebase Pixel updates
     ValueEventListener pixelListener = new ValueEventListener() {
         /**
@@ -117,9 +152,6 @@ public class PaintingActivity extends AppCompatActivity {
 
                 // Update GUI
                 updatePixelGUI(pixelId, newPixel.getColor());
-
-                // UpdatePaint
-                updatePaintLevel(whiteboard.getInkLevel());
             }
         }
 
@@ -209,6 +241,12 @@ public class PaintingActivity extends AppCompatActivity {
                 .child("whiteboards")
                 .addValueEventListener(whiteboardListener);
 
+        // Get user ink data from Firebase
+        mFirebaseDatabaseReference
+                .child("users")
+                .child(mUserId)
+                .addValueEventListener(userListener);
+
         // Get Whiteboard Pixel data and start listening for Pixel updates
         mFirebaseDatabaseReference
                 .child("board-data")
@@ -250,36 +288,39 @@ public class PaintingActivity extends AppCompatActivity {
     }
 
     /**
-     * change icon based on whitboard ink level percentage
-     * @param inkLevel double the current amout the user has left
+     * change icon based on whiteboard ink level percentage
+     * @param inkLevel int the current amount the user has left
      */
-    private void updatePaintLevel(double inkLevel) {
+    private void updatePaintLevel(int inkLevel) {
         ImageView inkMeter = findViewById(R.id.img_ink_meter);
+        double inkPercent = inkLevel / (double) Whiteboard.MAX_INK;
 
         // Full bottle
-        if (inkLevel == (double) Whiteboard.MAX_INK){
+        if (inkPercent >= 1.0){
             inkMeter.setImageResource(R.drawable.ink_bottle_4);
         }
 
+        // Empty
+        else if (inkPercent <= 0.0){
+            inkMeter.setImageResource(R.drawable.ink_bottle_0);
+        }
+
         // 25% or less
-        else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.25){
+        else if (inkPercent <= 0.25){
             inkMeter.setImageResource(R.drawable.ink_bottle_1);
         }
 
         // 50% or less
-        else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.50){
+        else if (inkPercent <= 0.50){
             inkMeter.setImageResource(R.drawable.ink_bottle_2);
         }
 
         // 75% or less
-        else if ((inkLevel / (double) Whiteboard.MAX_INK) <= 0.75){
+        else if (inkPercent <= 0.75){
             inkMeter.setImageResource(R.drawable.ink_bottle_3);
         }
 
-        // empty
-        else {
-            inkMeter.setImageResource(R.drawable.ink_bottle_0);
-        }
+        Log.d(TAG, "" + inkPercent);
     }
 
     private void updatePixelGUI(int pixelId, int newColor) {
@@ -312,7 +353,7 @@ public class PaintingActivity extends AppCompatActivity {
         textBoardName.setText(whiteboardName);
 
         // Get user's ID
-        mUserId = intent.getStringExtra("userID");
+        mUserId = intent.getStringExtra("userId");
     }
 
     /**
