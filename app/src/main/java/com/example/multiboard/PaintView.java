@@ -54,7 +54,6 @@ public class PaintView extends View {
     private Whiteboard whiteboard;
     private String userId;
     private DatabaseReference dbReference;
-    private DatabaseReference curPathReference;
 
     // Other
     private ImageView imageInk;
@@ -89,11 +88,6 @@ public class PaintView extends View {
 
             // Iterate over all children of the node
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                // Ignore if ds is current path
-                if (curPathReference != null && curPathReference.getKey().equals(ds.getKey())) {
-                    continue;
-                }
-
                 // Get the data as a StrokePath and add it to the drawing list
                 StrokePath sp = ds.getValue(StrokePath.class);
                 paths.add(sp);
@@ -273,9 +267,6 @@ public class PaintView extends View {
         mX = x;
         mY = y;
         strokePath.addPathPoint(x, y);
-
-        // Start path in database
-        curPathReference = addPathToDB(strokePath);
     }
 
     /**
@@ -303,9 +294,6 @@ public class PaintView extends View {
             mY = y;
         }
 
-        // Update StrokePath data
-        curPathReference.setValue(strokePath);
-
         updateInk();
     }
 
@@ -314,12 +302,8 @@ public class PaintView extends View {
      * to the last known finger location. Re-enables drawing if possible.
      */
     private void touchUp() {
-        // Update StrokePath data
-        if (curPathReference != null) {
-            curPathReference.setValue(strokePath);
-        }
+        addPathToDB(strokePath);
         strokePath = null;
-        curPathReference = null;
 
         // Re-enable drawing if possible
         if (whiteboard.getInkLevel() > 0f) {
@@ -348,8 +332,8 @@ public class PaintView extends View {
                     invalidate();
                 } else {
                     // Touch event failed (out of ink)
+                    addPathToDB(strokePath);
                     strokePath = null;
-                    curPathReference = null;
                 }
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -358,8 +342,8 @@ public class PaintView extends View {
                     invalidate();
                 } else {
                     // Touch event failed (out of ink)
+                    addPathToDB(strokePath);
                     strokePath = null;
-                    curPathReference = null;
                 }
                 break;
         }
@@ -371,7 +355,7 @@ public class PaintView extends View {
     /**
      * Creates a new DatabaseReference where the path will be stored and stores its data there.
      * @param sp the StrokePath to add to the database.
-     * @return a reference to the StrokePath.
+     * @return a reference to the StrokePath in the database.
      */
     private DatabaseReference addPathToDB(StrokePath sp) {
         // Get a new identifier for the current path
