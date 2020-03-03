@@ -85,7 +85,8 @@ public class InkRefiller {
                 }
 
                 // Refill
-                Float newInk = oldInk + millisElapsed * INK_REFILL_RATE;
+                Float addInk = millisElapsed * INK_REFILL_RATE;
+                Float newInk = Math.min(oldInk + addInk, Whiteboard.MAX_INK);
 
                 // Send to database
                 ds.getRef().setValue(newInk);

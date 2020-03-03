@@ -308,13 +308,20 @@ public class PaintView extends View {
 
     /**
      * Called when a finger lifts up off the screen. Ends the drawing path with a final line
-     * to the last known finger location.
+     * to the last known finger location. Re-enables drawing if possible.
      */
     private void touchUp() {
         // Update StrokePath data
-        curPathReference.setValue(strokePath);
+        if (curPathReference != null) {
+            curPathReference.setValue(strokePath);
+        }
         strokePath = null;
         curPathReference = null;
+
+        // Re-enable drawing if possible
+        if (whiteboard.getInkLevel() > 0f) {
+            canDraw = true;
+        }
     }
 
     /**
@@ -327,28 +334,35 @@ public class PaintView extends View {
         float x = event.getX();
         float y = event.getY();
 
-        if (canDraw) {
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_UP:
+                touchUp();
+                invalidate();
+                break;
+            case MotionEvent.ACTION_DOWN:
+                if (canDraw) {
                     touchStart(x, y);
                     invalidate();
-                    break;
-                case MotionEvent.ACTION_MOVE:
+                } else {
+                    // Touch event failed (out of ink)
+                    strokePath = null;
+                    curPathReference = null;
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (canDraw) {
                     touchMove(x, y);
                     invalidate();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    touchUp();
-                    invalidate();
-                    break;
-            }
-            // Touch event handled
-            return true;
+                } else {
+                    // Touch event failed (out of ink)
+                    strokePath = null;
+                    curPathReference = null;
+                }
+                break;
         }
-        // Touch event failed (out of ink)
-        strokePath = null;
-        curPathReference = null;
-        return false;
+
+        // Event handled
+        return true;
     }
 
     /**
