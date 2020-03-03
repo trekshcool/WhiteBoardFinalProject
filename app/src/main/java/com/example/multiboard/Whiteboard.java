@@ -1,7 +1,6 @@
 package com.example.multiboard;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
@@ -15,7 +14,6 @@ import androidx.cardview.widget.CardView;
 public class Whiteboard implements Comparable<Whiteboard> {
 
     // Constants
-    private final static String TAG = "Whiteboard";
     final static int WIDTH = 1400;
     final static int HEIGHT = 2000;
     public final static float MAX_INK = 300000f;

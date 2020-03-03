@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -78,7 +77,7 @@ public class PaintView extends View {
         }
 
         @Override
-        public void onCancelled(DatabaseError error) {}
+        public void onCancelled(@NonNull DatabaseError error) {}
     };
 
     ValueEventListener pathListener = new ValueEventListener() {
