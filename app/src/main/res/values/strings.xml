@@ -20,4 +20,5 @@
     <string name="item_medium_name">Medium Brush</string>
     <string name="item_small_name">Small Brush</string>
     <string name="img_ink_meter">An image of a bottle of ink showing how much ink you have remaining.</string>
+    <string name="item_sign_out_name">Sign out</string>
 </resources>
