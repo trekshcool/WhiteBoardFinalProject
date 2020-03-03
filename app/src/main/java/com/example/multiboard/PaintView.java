@@ -7,9 +7,11 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import androidx.annotation.NonNull;
 
@@ -27,7 +29,9 @@ import java.util.ArrayList;
 public class PaintView extends View {
 
     // Constant brush variables
-    public static int DEFAULT_SIZE = 8;
+    public static int DEFAULT_SIZE = 18;
+    public static int SMALL_SIZE = 8;
+    public static int LARGE_SIZE = 40;
     public static final int DEFAULT_COLOR = Color.BLACK;
     private static final float TOUCH_TOLERANCE = 4;
 
@@ -48,8 +52,13 @@ public class PaintView extends View {
 
     // Variables for up/downloading database information
     private Whiteboard whiteboard;
+    private String userId;
     private DatabaseReference dbReference;
     private DatabaseReference curPathReference;
+
+    // Other
+    private ImageView imageInk;
+    private boolean canDraw = true;
 
     ValueEventListener dataSetupListener = new ValueEventListener() {
         @Override
@@ -103,6 +112,21 @@ public class PaintView extends View {
         public void onCancelled(@NonNull DatabaseError databaseError) {}
     };
 
+    // Listener for changes in ink level
+    ValueEventListener inkListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            Float newInk = dataSnapshot.getValue(Float.class);
+            if (newInk != null) {
+                whiteboard.setInkLevel(newInk);
+                updateInk();
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {}
+    };
+
     /**
      * Construct a PaintView with the given context.
      * @param context the context the new PaintView is in.
@@ -136,8 +160,12 @@ public class PaintView extends View {
      * @param width the width of the canvas in pixels.
      * @param height the height of the canvas in pixels.
      * @param whiteboard a reference to the Whiteboard to draw on (needed for database up/download).
+     * @param userId the ID of the current user.
      */
-    public void init(int width, int height, Whiteboard whiteboard) {
+    public void init(int width, int height, Whiteboard whiteboard, String userId) {
+        // Find views
+        imageInk = ((View)getParent()).findViewById(R.id.img_ink_meter);
+
         // Create canvas from a bitmap
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         canvas = new Canvas(bitmap);
@@ -148,16 +176,26 @@ public class PaintView extends View {
 
         // Whiteboard and database setup
         this.whiteboard = whiteboard;
+        this.userId = userId;
         dbReference = FirebaseDatabase.getInstance().getReference();
 
         // Add child for this Whiteboard if none exists
         dbReference
                 .child("stroke-data")
                 .addListenerForSingleValueEvent(dataSetupListener);
+
+        // Listen to changes in the stroke data
         dbReference
                 .child("stroke-data")
                 .child(whiteboard.getName())
                 .addValueEventListener(pathListener);
+
+        // Listen to changes in ink level
+        dbReference
+                .child("users")
+                .child(userId)
+                .child(whiteboard.getName())
+                .addValueEventListener(inkListener);
     }
 
     /**
@@ -207,6 +245,17 @@ public class PaintView extends View {
         canvas.restore();
     }
 
+    void updateInk() {
+        // Set the image based on the ink level
+        imageInk.setImageResource(whiteboard.getInkDrawable());
+
+        // Stop drawing if depleted
+        if (whiteboard.getInkLevel() <= 0f) {
+            canDraw = false;
+            whiteboard.setInkLevel(0f);
+        }
+    }
+
     /**
      * Called when a finger first touches the screen. Begins a new drawing path.
      * @param x the x-coordinate of the touch.
@@ -238,6 +287,16 @@ public class PaintView extends View {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
 
+        // Deplete ink
+        float spentInk = (float)Math.sqrt(dx * dx + dy * dy) * strokeWidth;
+        float newInkLevel = whiteboard.getInkLevel() - spentInk;
+        whiteboard.setInkLevel(newInkLevel);
+        dbReference
+                .child("users")
+                .child(userId)
+                .child(whiteboard.getName())
+                .setValue(whiteboard.getInkLevel());
+
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
             strokePath.addPathPoint((x + mX) / 2, (y + mY) / 2);
             mX = x;
@@ -246,44 +305,66 @@ public class PaintView extends View {
 
         // Update StrokePath data
         curPathReference.setValue(strokePath);
+
+        updateInk();
     }
 
     /**
      * Called when a finger lifts up off the screen. Ends the drawing path with a final line
-     * to the last known finger location.
+     * to the last known finger location. Re-enables drawing if possible.
      */
     private void touchUp() {
         // Update StrokePath data
-        curPathReference.setValue(strokePath);
+        if (curPathReference != null) {
+            curPathReference.setValue(strokePath);
+        }
         strokePath = null;
         curPathReference = null;
+
+        // Re-enable drawing if possible
+        if (whiteboard.getInkLevel() > 0f) {
+            canDraw = true;
+        }
     }
 
     /**
      * Called with any touch input in this View.
      * @param event information about the touch event.
-     * @return true if handled, false otherwise (all touch events are handled).
+     * @return true if handled, false otherwise.
      */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
 
-        switch(event.getAction()) {
-            case MotionEvent.ACTION_DOWN :
-                touchStart(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_MOVE :
-                touchMove(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP :
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_UP:
                 touchUp();
                 invalidate();
                 break;
+            case MotionEvent.ACTION_DOWN:
+                if (canDraw) {
+                    touchStart(x, y);
+                    invalidate();
+                } else {
+                    // Touch event failed (out of ink)
+                    strokePath = null;
+                    curPathReference = null;
+                }
+                break;
+            case MotionEvent.ACTION_MOVE:
+                if (canDraw) {
+                    touchMove(x, y);
+                    invalidate();
+                } else {
+                    // Touch event failed (out of ink)
+                    strokePath = null;
+                    curPathReference = null;
+                }
+                break;
         }
-        // Touch event handled
+
+        // Event handled
         return true;
     }
 

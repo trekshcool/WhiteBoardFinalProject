@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity {
     // Arraylist of all Whiteboards
     private ArrayList<Whiteboard> whiteboardList;
 
-    // Callbacks for Firebase updates
+    // Callbacks for Firebase Whiteboard data
     ValueEventListener whiteboardListener = new ValueEventListener() {
         /**
          * This method is called when the Activity is started and whenever something in the
@@ -80,6 +80,9 @@ public class MainActivity extends AppCompatActivity {
          */
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            // Clear Whiteboard list
+            whiteboardList = new ArrayList<>();
+
             // Iterate over all modified whiteboards
             for (DataSnapshot ds : dataSnapshot.getChildren()) {
                 // Get Whiteboard object from database
@@ -92,10 +95,63 @@ public class MainActivity extends AppCompatActivity {
 
                 // Fill in information on the new list card
                 try {
-                    wb.setupListCard(getBaseContext(), cardView);
+                    wb.setupListCard(cardView);
                 } catch (NullPointerException e) {
                     e.printStackTrace();
                 }
+            }
+
+            // Listen for user ink levels
+            mFirebaseDatabaseReference
+                    .child("users")
+                    .addValueEventListener(userListener);
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {
+            // Getting data failed
+            Log.w(TAG, databaseError.toException());
+        }
+    };
+
+    // Callback for Firebase user data
+    ValueEventListener userListener = new ValueEventListener() {
+        /**
+         * This method is called when the Activity is started to get ink level information
+         * for the current user.
+         * @param dataSnapshot new data.
+         */
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            // If user has no record for any Whiteboard
+            for (Whiteboard wb : whiteboardList) {
+                if (!dataSnapshot.hasChild(mUserId) ||
+                        !dataSnapshot.child(mUserId).hasChild(wb.getName())) {
+                    // Populate with max ink
+                    mFirebaseDatabaseReference
+                            .child("users")
+                            .child(mUserId)
+                            .child(wb.getName())
+                            .setValue(Whiteboard.MAX_INK);
+                }
+            }
+
+            // Get user data snapshot
+            DataSnapshot dataUser = dataSnapshot.child(mUserId);
+
+            // Set whiteboard ink data from database
+            for (DataSnapshot dataWB : dataUser.getChildren()) {
+                // Get Whiteboard object
+                Whiteboard whiteboard = getWhiteboardByName(dataWB.getKey());
+
+                // Get ink level for this whiteboard
+                Float ink = dataWB.getValue(Float.class);
+                if (ink != null) {
+                    whiteboard.setInkLevel(ink);
+                }
+
+                // Display new ink level
+                whiteboard.updateInkLevel();
             }
         }
 
@@ -103,6 +159,7 @@ public class MainActivity extends AppCompatActivity {
         public void onCancelled(@NonNull DatabaseError databaseError) {
             // Getting data failed
             Log.w(TAG, databaseError.toException());
+            finish();
         }
     };
 
@@ -121,6 +178,9 @@ public class MainActivity extends AppCompatActivity {
         linearWhiteboards = findViewById(R.id.linear_whiteboards);
         mInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
+        // Whiteboards
+        whiteboardList = new ArrayList<>();
+
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
@@ -138,14 +198,13 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
-        // Firebase data
+        // Firebase
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
+
+        // Listen for Whiteboard changes
         mFirebaseDatabaseReference
                 .child("whiteboards")
                 .addValueEventListener(whiteboardListener);
-
-        // Whiteboards
-        whiteboardList = new ArrayList<>();
 
         // Create callback function for realtime location results
         locationCallback = new LocationCallback() {
@@ -184,6 +243,9 @@ public class MainActivity extends AppCompatActivity {
 
         //Begin realtime update listening
         startLocationUpdates();
+
+        // Start the InkRefiller
+        InkRefiller.getInstance().startRefilling(mUserId);
     }
 
     @Override
@@ -208,7 +270,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume called");
         super.onResume();
         startLocationUpdates();
     }
@@ -221,14 +282,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart(){
-        Log.d(TAG, "onStart called");
         super.onStart();
         startLocationUpdates();
     }
 
     @Override
     protected void onStop(){
-        Log.d(TAG, "onStop called");
         super.onStop();
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
@@ -238,12 +297,9 @@ public class MainActivity extends AppCompatActivity {
      * @param loc the new location to update to.
      */
     public void updateCurLoc(Location loc) {
-        Log.d(TAG, "Updating");
-
         //Store the new Location
-        curLoc = loc;
-        if (curLoc != null) {
-            Log.d(TAG, "LAT: " + loc.getLatitude() + ", LON: " + loc.getLongitude());
+        if (loc != null) {
+            curLoc = loc;
         }
     }
 
@@ -268,11 +324,9 @@ public class MainActivity extends AppCompatActivity {
      * Updates all Whiteboard availability using the distance function and curLoc.
      */
     private void updateWhiteboardAvailability(){
-        Log.d(TAG, "Updating Whiteboards");
 
         // Loop through Whiteboards in whiteboardList
         for (Whiteboard whiteboard : whiteboardList){
-            Log.d(TAG, "Update Whiteboard: " + whiteboard.getName());
             whiteboard.updateDistance(curLoc.getLatitude(), curLoc.getLongitude());
         }
 
@@ -296,26 +350,18 @@ public class MainActivity extends AppCompatActivity {
         startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 
-    //Return infomation on return
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        Log.v(TAG, "get from PaintingActivity");
-
-        switch (requestCode){
-            case REQUEST_CODE_PAINT: {
-                Log.v(TAG, "request code corect");
-                if (resultCode == Activity.RESULT_OK) {
-                    Log.v(TAG, "Activity ok");
-                    //Log.v(TAG, data.getStringExtra("count"));
-                } else { // if fails
-                    Log.v(TAG, "Activity canciled");
-                }
-                break;
+    /**
+     * Get the Whiteboard with the given name from the whiteboardList.
+     * @param name the name to search for.
+     * @return the Whiteboard with this name, null if not found.
+     */
+    public Whiteboard getWhiteboardByName(String name) {
+        for (Whiteboard wb : whiteboardList) {
+            if (wb.getName().equals(name)) {
+                return wb;
             }
-            //if request is wrong
-            default:  Log.v(TAG, "request code wrong");
-                break;
         }
+        return null;
     }
 
 

@@ -43,4 +43,19 @@
         android:id="@+id/item_brown"
         android:icon="@drawable/brown_brush"
         android:title="@string/item_brown_name" />
+
+    <item
+        android:id="@+id/item_large"
+        android:icon="@drawable/large_brush"
+        android:title="@string/item_large_name" />
+
+    <item
+        android:id="@+id/item_medium"
+        android:icon="@drawable/medium_brush"
+        android:title="@string/item_medium_name" />
+
+    <item
+        android:id="@+id/item_small"
+        android:icon="@drawable/small_brush"
+        android:title="@string/item_small_name" />
 </menu>

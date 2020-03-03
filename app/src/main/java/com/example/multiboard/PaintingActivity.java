@@ -25,6 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class PaintingActivity extends AppCompatActivity {
 
     // Debugging
@@ -52,7 +55,7 @@ public class PaintingActivity extends AppCompatActivity {
     private MenuPopupHelper popupPaint;
 
     // User information
-    private String mUserId;
+    private String userId;
 
     // Firebase variables
     private FirebaseAuth mFirebaseAuth;
@@ -74,44 +77,9 @@ public class PaintingActivity extends AppCompatActivity {
                 Whiteboard dsWhiteboard = ds.getValue(Whiteboard.class);
                 if (dsWhiteboard.getName().equals(whiteboardName)) {
                     whiteboard = dsWhiteboard;
-                    paintView.init(Whiteboard.WIDTH, Whiteboard.HEIGHT, whiteboard);
+                    paintView.init(Whiteboard.WIDTH, Whiteboard.HEIGHT, whiteboard, userId);
                 }
             }
-        }
-
-        @Override
-        public void onCancelled(@NonNull DatabaseError databaseError) {
-            // Getting data failed
-            Log.w(TAG, databaseError.toException());
-            finish();
-        }
-    };
-
-    // Callback for Firebase user data
-    ValueEventListener userListener = new ValueEventListener() {
-        /**
-         * This method is called when the Activity is started to get ink level information
-         * for the current user.
-         * @param dataSnapshot new data.
-         */
-        @Override
-        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-            Log.d(TAG, "Got data.");
-            // Iterate over all users
-            for (DataSnapshot ds : dataSnapshot.getChildren()) {
-                // Get whiteboard ink data from database
-                String dsWhiteboardName = ds.getKey();
-                if (whiteboardName.equals(dsWhiteboardName)) {
-                    // Store ink level
-                    Integer ink = ds.getValue(Integer.class);
-                    if (ink != null) {
-                        whiteboard.setInkLevel(ink);
-                    }
-                }
-            }
-
-            // Display new ink level
-            updatePaintLevel(whiteboard.getInkLevel());
         }
 
         @Override
@@ -160,6 +128,15 @@ public class PaintingActivity extends AppCompatActivity {
                 case "Brown":
                     paintView.setColor(BROWN);
                     return true;
+                case "Large Brush":
+                    paintView.setStrokeWidth(PaintView.LARGE_SIZE);
+                    return true;
+                case "Medium Brush":
+                    paintView.setStrokeWidth(PaintView.DEFAULT_SIZE);
+                    return true;
+                case "Small Brush":
+                    paintView.setStrokeWidth(PaintView.SMALL_SIZE);
+                    return true;
             }
 
             // Event not handled
@@ -199,47 +176,7 @@ public class PaintingActivity extends AppCompatActivity {
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseDatabaseReference
                 .child("whiteboards")
-                .addValueEventListener(whiteboardListener);
-
-        // Get user ink data from Firebase
-        mFirebaseDatabaseReference
-                .child("users")
-                .child(mUserId)
-                .addValueEventListener(userListener);
-    }
-
-    /**
-     * change icon based on whiteboard ink level percentage
-     * @param inkLevel int the current amount the user has left
-     */
-    private void updatePaintLevel(int inkLevel) {
-        ImageView inkMeter = findViewById(R.id.img_ink_meter);
-        double inkPercent = inkLevel / (double) Whiteboard.MAX_INK;
-
-        // Full bottle
-        if (inkPercent >= 1.0){
-            inkMeter.setImageResource(R.drawable.ink_bottle_4);
-        }
-
-        // Empty
-        else if (inkPercent <= 0.0){
-            inkMeter.setImageResource(R.drawable.ink_bottle_0);
-        }
-
-        // 25% or less
-        else if (inkPercent <= 0.25){
-            inkMeter.setImageResource(R.drawable.ink_bottle_1);
-        }
-
-        // 50% or less
-        else if (inkPercent <= 0.50){
-            inkMeter.setImageResource(R.drawable.ink_bottle_2);
-        }
-
-        // 75% or less
-        else if (inkPercent <= 0.75){
-            inkMeter.setImageResource(R.drawable.ink_bottle_3);
-        }
+                .addListenerForSingleValueEvent(whiteboardListener);
     }
 
     /**
@@ -252,15 +189,15 @@ public class PaintingActivity extends AppCompatActivity {
         whiteboardName = intent.getStringExtra("whiteboardName");
         textBoardName.setText(whiteboardName);
 
-        // Get user's ID
-        mUserId = intent.getStringExtra("userId");
+        // Get user's information
+        userId = intent.getStringExtra("userId");
     }
 
     /**
      * Create an Intent to launch the PaintingActivity with the given Whiteboard name.
      * @param context current context to launch the Activity with.
      * @param whiteboardName the name of the Whiteboard to paint on.
-     * @param userId the ID of the current user.
+     * @param userId the userId of the current user.
      * @return the new Intent ready to be started.
      */
     public static Intent makeIntent(Context context, String whiteboardName, String userId) {
