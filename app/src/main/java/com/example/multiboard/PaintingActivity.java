@@ -14,7 +14,6 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -24,9 +23,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class PaintingActivity extends AppCompatActivity {
 

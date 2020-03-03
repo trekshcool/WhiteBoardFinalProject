@@ -1,7 +1,5 @@
 package com.example.multiboard;
 
-import android.util.Log;
-
 import androidx.annotation.NonNull;
 
 import com.google.firebase.database.DataSnapshot;
@@ -43,6 +41,7 @@ public class InkRefiller {
         }
     };
 
+    // Called when starting the refiller to find out when the user was last active
     private ValueEventListener userLoginTimeListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -72,6 +71,7 @@ public class InkRefiller {
         public void onCancelled(@NonNull DatabaseError databaseError) {}
     };
 
+    // Called with every scheduled refill() call from refillTimer to refill all of the ink levels
     private ValueEventListener inkUpdateListener = new ValueEventListener() {
         @Override
         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
