@@ -25,7 +25,7 @@ public class Whiteboard implements Comparable<Whiteboard> {
     private double mLatitude; // Coordinates for the centroid
     private double mLongitude;
     private double mRadius; // Radius of geofence circle
-    private float mInkLevel;
+    private Float mInkLevel;
     private boolean active = false; // Whether the Whiteboard is in range or not
     private double distFromUser = Double.MAX_VALUE;
 
@@ -61,14 +61,15 @@ public class Whiteboard implements Comparable<Whiteboard> {
      * Prints all the necessary data to a given Whiteboard list card.
      * @param view the ViewGroup corresponding to the Whiteboard's list card.
      */
-    public void setupListCard(View view) {
+    void setupListCard(View view) {
         // Set Whiteboard text views
         mCardView = (CardView) view;
         ((TextView) view.findViewById(R.id.text_name)).setText(getName());
-
-        updateInkLevel();
         distText = view.findViewById(R.id.text_dist);
         distText.setText(R.string.default_dist_text);
+
+        // Write current ink level
+        updateInkLevel();
     }
 
     /**
@@ -187,7 +188,7 @@ public class Whiteboard implements Comparable<Whiteboard> {
     /**
      * @return amount of ink user has left.
      */
-    float getInkLevel() {
+    Float getInkLevel() {
         return mInkLevel;
     }
 
@@ -195,7 +196,7 @@ public class Whiteboard implements Comparable<Whiteboard> {
      * Set the user's ink level.
      * @param inkLevel new ink remaining.
      */
-    void setInkLevel(float inkLevel) {
+    void setInkLevel(Float inkLevel) {
         mInkLevel = inkLevel;
     }
 
@@ -287,25 +288,24 @@ public class Whiteboard implements Comparable<Whiteboard> {
      */
     int getInkDrawable() {
         double inkPercent = getInkPercent();
-        Log.d(TAG, inkPercent + "");
 
         // Empty
-        if (inkPercent <= 0.0){
+        if (inkPercent <= 0.0f){
             return R.drawable.ink_bottle_0;
         }
 
         // 25% or less
-        else if (inkPercent <= 0.25){
+        else if (inkPercent <= 0.25f){
             return R.drawable.ink_bottle_1;
         }
 
         // 50% or less
-        else if (inkPercent <= 0.50){
+        else if (inkPercent <= 0.50f){
             return R.drawable.ink_bottle_2;
         }
 
         // 75% or less
-        else if (inkPercent <= 0.75){
+        else if (inkPercent <= 0.75f){
             return R.drawable.ink_bottle_3;
         }
 

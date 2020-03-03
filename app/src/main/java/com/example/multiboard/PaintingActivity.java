@@ -55,7 +55,7 @@ public class PaintingActivity extends AppCompatActivity {
     private MenuPopupHelper popupPaint;
 
     // User information
-    private float inkLevel;
+    private String userId;
 
     // Firebase variables
     private FirebaseAuth mFirebaseAuth;
@@ -77,8 +77,7 @@ public class PaintingActivity extends AppCompatActivity {
                 Whiteboard dsWhiteboard = ds.getValue(Whiteboard.class);
                 if (dsWhiteboard.getName().equals(whiteboardName)) {
                     whiteboard = dsWhiteboard;
-                    whiteboard.setInkLevel(inkLevel);
-                    paintView.init(Whiteboard.WIDTH, Whiteboard.HEIGHT, whiteboard);
+                    paintView.init(Whiteboard.WIDTH, Whiteboard.HEIGHT, whiteboard, userId);
                 }
             }
         }
@@ -168,7 +167,7 @@ public class PaintingActivity extends AppCompatActivity {
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference();
         mFirebaseDatabaseReference
                 .child("whiteboards")
-                .addValueEventListener(whiteboardListener);
+                .addListenerForSingleValueEvent(whiteboardListener);
     }
 
     /**
@@ -182,21 +181,21 @@ public class PaintingActivity extends AppCompatActivity {
         textBoardName.setText(whiteboardName);
 
         // Get user's information
-        inkLevel = intent.getFloatExtra("inkLevel", 0f);
+        userId = intent.getStringExtra("userId");
     }
 
     /**
      * Create an Intent to launch the PaintingActivity with the given Whiteboard name.
      * @param context current context to launch the Activity with.
      * @param whiteboardName the name of the Whiteboard to paint on.
-     * @param inkLevel the inkLevel of the current user for this Whiteboard.
+     * @param userId the userId of the current user.
      * @return the new Intent ready to be started.
      */
-    public static Intent makeIntent(Context context, String whiteboardName, float inkLevel) {
+    public static Intent makeIntent(Context context, String whiteboardName, String userId) {
         // Create the intent with an extra for the Whiteboard name
         Intent intent = new Intent(context, PaintingActivity.class);
         intent.putExtra("whiteboardName", whiteboardName);
-        intent.putExtra("inkLevel", inkLevel);
+        intent.putExtra("userId", userId);
         return intent;
     }
 

@@ -141,7 +141,6 @@ public class MainActivity extends AppCompatActivity {
 
             // Set whiteboard ink data from database
             for (DataSnapshot dataWB : dataUser.getChildren()) {
-                Log.d(TAG, dataWB.getKey());
                 // Get Whiteboard object
                 Whiteboard whiteboard = getWhiteboardByName(dataWB.getKey());
 
@@ -271,7 +270,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume called");
         super.onResume();
         startLocationUpdates();
     }
@@ -284,14 +282,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onStart(){
-        Log.d(TAG, "onStart called");
         super.onStart();
         startLocationUpdates();
     }
 
     @Override
     protected void onStop(){
-        Log.d(TAG, "onStop called");
         super.onStop();
         fusedLocationClient.removeLocationUpdates(locationCallback);
     }
@@ -301,12 +297,9 @@ public class MainActivity extends AppCompatActivity {
      * @param loc the new location to update to.
      */
     public void updateCurLoc(Location loc) {
-        Log.d(TAG, "Updating");
-
         //Store the new Location
-        curLoc = loc;
-        if (curLoc != null) {
-            Log.d(TAG, "LAT: " + loc.getLatitude() + ", LON: " + loc.getLongitude());
+        if (loc != null) {
+            curLoc = loc;
         }
     }
 
@@ -331,11 +324,9 @@ public class MainActivity extends AppCompatActivity {
      * Updates all Whiteboard availability using the distance function and curLoc.
      */
     private void updateWhiteboardAvailability(){
-        Log.d(TAG, "Updating Whiteboards");
 
         // Loop through Whiteboards in whiteboardList
         for (Whiteboard whiteboard : whiteboardList){
-            Log.d(TAG, "Update Whiteboard: " + whiteboard.getName());
             whiteboard.updateDistance(curLoc.getLatitude(), curLoc.getLongitude());
         }
 
@@ -355,7 +346,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = PaintingActivity.makeIntent(
                 MainActivity.this,
                 whiteboard.getName(),
-                whiteboard.getInkLevel());
+                mUserId);
         startActivityForResult(intent, REQUEST_CODE_PAINT);
     }
 

@@ -50,6 +50,7 @@ public class PaintView extends View {
 
     // Variables for up/downloading database information
     private Whiteboard whiteboard;
+    private String userId;
     private DatabaseReference dbReference;
     private DatabaseReference curPathReference;
 
@@ -109,6 +110,21 @@ public class PaintView extends View {
         public void onCancelled(@NonNull DatabaseError databaseError) {}
     };
 
+    // Listener for changes in ink level
+    ValueEventListener inkListener = new ValueEventListener() {
+        @Override
+        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+            Float newInk = dataSnapshot.getValue(Float.class);
+            if (newInk != null) {
+                whiteboard.setInkLevel(newInk);
+                updateInk();
+            }
+        }
+
+        @Override
+        public void onCancelled(@NonNull DatabaseError databaseError) {}
+    };
+
     /**
      * Construct a PaintView with the given context.
      * @param context the context the new PaintView is in.
@@ -142,12 +158,11 @@ public class PaintView extends View {
      * @param width the width of the canvas in pixels.
      * @param height the height of the canvas in pixels.
      * @param whiteboard a reference to the Whiteboard to draw on (needed for database up/download).
+     * @param userId the ID of the current user.
      */
-    public void init(int width, int height, Whiteboard whiteboard) {
+    public void init(int width, int height, Whiteboard whiteboard, String userId) {
         // Find views
         imageInk = ((View)getParent()).findViewById(R.id.img_ink_meter);
-
-        Log.d("PaintingActivity", whiteboard.getInkLevel() + "");
 
         // Create canvas from a bitmap
         bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
@@ -159,17 +174,26 @@ public class PaintView extends View {
 
         // Whiteboard and database setup
         this.whiteboard = whiteboard;
+        this.userId = userId;
         dbReference = FirebaseDatabase.getInstance().getReference();
-        updateInk();
 
         // Add child for this Whiteboard if none exists
         dbReference
                 .child("stroke-data")
                 .addListenerForSingleValueEvent(dataSetupListener);
+
+        // Listen to changes in the stroke data
         dbReference
                 .child("stroke-data")
                 .child(whiteboard.getName())
                 .addValueEventListener(pathListener);
+
+        // Listen to changes in ink level
+        dbReference
+                .child("users")
+                .child(userId)
+                .child(whiteboard.getName())
+                .addValueEventListener(inkListener);
     }
 
     /**
@@ -260,8 +284,15 @@ public class PaintView extends View {
     private void touchMove(float x, float y) {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
+
+        // Deplete ink
         float newInkLevel = whiteboard.getInkLevel() - (float)Math.sqrt(dx * dx + dy * dy);
         whiteboard.setInkLevel(newInkLevel);
+        dbReference
+                .child("users")
+                .child(userId)
+                .child(whiteboard.getName())
+                .setValue(whiteboard.getInkLevel());
 
         if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
             strokePath.addPathPoint((x + mX) / 2, (y + mY) / 2);

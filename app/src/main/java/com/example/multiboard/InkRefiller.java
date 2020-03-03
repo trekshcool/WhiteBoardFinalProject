@@ -10,9 +10,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -26,7 +24,7 @@ public class InkRefiller {
 
     // Ink refill rates
     private final float INK_REFILL_RATE = 1f;//0.01f;  // per millisecond
-    private final long TIMER_UPDATE_RATE = 1000;
+    private final long TIMER_UPDATE_RATE = 800;
 
     // Update information
     private String userId;
@@ -66,7 +64,6 @@ public class InkRefiller {
 
             // If somehow lastTime has still not been set
             if (lastTime == null) {
-                Log.d("PROBLEMS", "we got problems");
                 lastTime = curTime;
             }
         }
