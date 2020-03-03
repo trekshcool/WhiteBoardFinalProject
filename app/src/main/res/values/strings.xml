@@ -16,5 +16,8 @@
     <string name="item_purple_name">Purple</string>
     <string name="item_pink_name">Pink</string>
     <string name="item_brown_name">Brown</string>
+    <string name="item_large_name">Large Brush</string>
+    <string name="item_medium_name">Medium Brush</string>
+    <string name="item_small_name">Small Brush</string>
     <string name="img_ink_meter">An image of a bottle of ink showing how much ink you have remaining.</string>
 </resources>

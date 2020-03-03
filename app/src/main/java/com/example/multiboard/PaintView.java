@@ -29,7 +29,9 @@ import java.util.ArrayList;
 public class PaintView extends View {
 
     // Constant brush variables
-    public static int DEFAULT_SIZE = 8;
+    public static int DEFAULT_SIZE = 18;
+    public static int SMALL_SIZE = 8;
+    public static int LARGE_SIZE = 40;
     public static final int DEFAULT_COLOR = Color.BLACK;
     private static final float TOUCH_TOLERANCE = 4;
 
@@ -286,7 +288,8 @@ public class PaintView extends View {
         float dy = Math.abs(y - mY);
 
         // Deplete ink
-        float newInkLevel = whiteboard.getInkLevel() - (float)Math.sqrt(dx * dx + dy * dy);
+        float spentInk = (float)Math.sqrt(dx * dx + dy * dy) * strokeWidth;
+        float newInkLevel = whiteboard.getInkLevel() - spentInk;
         whiteboard.setInkLevel(newInkLevel);
         dbReference
                 .child("users")

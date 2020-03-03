@@ -128,6 +128,15 @@ public class PaintingActivity extends AppCompatActivity {
                 case "Brown":
                     paintView.setColor(BROWN);
                     return true;
+                case "Large Brush":
+                    paintView.setStrokeWidth(PaintView.LARGE_SIZE);
+                    return true;
+                case "Medium Brush":
+                    paintView.setStrokeWidth(PaintView.DEFAULT_SIZE);
+                    return true;
+                case "Small Brush":
+                    paintView.setStrokeWidth(PaintView.SMALL_SIZE);
+                    return true;
             }
 
             // Event not handled
