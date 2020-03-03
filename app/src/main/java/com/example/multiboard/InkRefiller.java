@@ -23,7 +23,7 @@ public class InkRefiller {
     private static InkRefiller instance;
 
     // Ink refill rates
-    private final float INK_REFILL_RATE = 1f;//0.01f;  // per millisecond
+    private final float INK_REFILL_RATE = 0.01f;  // per millisecond
     private final long TIMER_UPDATE_RATE = 800;
 
     // Update information
