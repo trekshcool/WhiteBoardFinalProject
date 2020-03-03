@@ -289,8 +289,8 @@ public class Whiteboard implements Comparable<Whiteboard> {
     int getInkDrawable() {
         double inkPercent = getInkPercent();
 
-        // Empty
-        if (inkPercent <= 0.0f){
+        // Empty to almost empty
+        if (inkPercent <= 0.05f){
             return R.drawable.ink_bottle_0;
         }
 
